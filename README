@@ -1,0 +1,3 @@
+# ATTiny85 MIDI to CV converter
+
+MIDI to CV converter for AE modular systems (based on ATTiny85 and MCP4728 chips)
