@@ -1,3 +1,12 @@
 # ATTiny85 MIDI to CV converter
 
 MIDI to CV converter for AE modular systems (based on ATTiny85 and MCP4728 chips)
+
+## Setup
+
+### MCP I2C addresses
+Expected address for the first and second MCP dacs are 0 and 1 respectively (you can use the `MCPAddressUtils` library to change the address).
+
+This is achieved by using the [SoftI2cMaster](https://github.com/TrippyLighting/SoftI2cMaster/tree/master) bit-banging library rather than the custom adapted MCP4728 library due to the needed LDAC pin behavior that can't be reproduced easily using I2C communication.
+
+An example on how to change the address of a MCP dac can be found in the library `example` folder or [here](https://github.com/jknipper/mcp4728_program_address/blob/master/mcp4728_program_address.ino)
