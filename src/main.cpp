@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <MidiRecv.h>
-#include <MCP4728.h>
+#include <Adafruit_MCP4728.h>
 #include "calibration.h"
 
 #define MIDI_IN_PIN (3)
@@ -13,7 +13,7 @@
 ReceiveOnlySoftwareSerial serial(MIDI_IN_PIN);
 MidiRecv midi(&serial);
 MidiRecv::MIDI_DATA midiData;
-MCP4728 dac;
+Adafruit_MCP4728 dac;
 
 uint16_t remapMidiNote(uint8_t midiNote, uint8_t lowerMidiNote);
 uint16_t remapMidiValue(uint8_t midiNote, uint8_t lowerBound = 0, uint8_t upperBound = 127);
