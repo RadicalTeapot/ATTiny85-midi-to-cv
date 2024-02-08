@@ -24,3 +24,6 @@ An example on how to change the address of a MCP dac can be found in the library
 To fix the issue compiling Adafruit MCP4728 library change the begin function implementation in Adafruit_MCP4728.cpp to return `bool` rather than `boolean`
 
 **TO DO** I should create a PR to fix this at the source.
+
+### MIDI
+If MIDI communication doesn't work, double check fuses have been set for both master and slave ATTiny85s.
