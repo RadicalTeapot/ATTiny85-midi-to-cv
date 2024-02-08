@@ -29,4 +29,4 @@ To fix the issue compiling Adafruit MCP4728 library change the begin function im
 If MIDI communication doesn't work, double check fuses have been set for both master and slave ATTiny85s.
 
 ### Wiring
-![MIDI to CV wiring](assets/images/midi to cv wiring.png)
+![MIDI to CV wiring](assets/images/midi%20to%20cv%20wiring.png)
