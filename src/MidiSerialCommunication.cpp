@@ -1,3 +1,4 @@
+#ifdef ARDUINO
 #include "MidiSerialCommunication.h"
 
 #define BAUD_RATE 31250
@@ -21,3 +22,4 @@ bool MidiSerialCommunication::recv(MidiEvent *midiEvent)
     }
     return false;
 }
+#endif
