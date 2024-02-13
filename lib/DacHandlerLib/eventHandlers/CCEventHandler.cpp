@@ -16,7 +16,7 @@ CCEventHandler::CCEventHandler(
     _cc[3].number = number4;
 }
 
-bool CCEventHandler::handleEvent(MidiEvent *event, DacValues *dacValues)
+bool CCEventHandler::handleEvent(const MidiEvent *event, DacValues *dacValues)
 {
     if (dacValues == nullptr || event == nullptr || event->type != MidiEventType::CC)
     {
@@ -33,7 +33,7 @@ bool CCEventHandler::handleEvent(MidiEvent *event, DacValues *dacValues)
     return false;
 }
 
-bool CCEventHandler::_handleEvent(uint8_t index, MidiCCEvent *event, DacValues *dacValues)
+bool CCEventHandler::_handleEvent(uint8_t index, const MidiCCEvent *event, DacValues *dacValues)
 {
     if (_cc[index].channel == event->channel && _cc[index].number == event->number)
     {

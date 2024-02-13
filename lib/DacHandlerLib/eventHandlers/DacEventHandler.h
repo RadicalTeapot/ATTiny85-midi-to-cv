@@ -7,7 +7,7 @@
 class DacEventHandler {
     public:
         virtual ~DacEventHandler() {}
-        virtual bool handleEvent(MidiEvent *event, DacValues *dacValues) = 0;
+        virtual bool handleEvent(const MidiEvent *event, DacValues *dacValues) = 0;
 };
 
 #endif // DacEventHandler_h

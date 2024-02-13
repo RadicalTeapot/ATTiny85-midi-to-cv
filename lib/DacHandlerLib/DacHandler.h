@@ -13,7 +13,7 @@ class DacHandler {
 
         ~DacHandler();
         void setHandler(DacEventHandler *handler);
-        bool handleEvent(MidiEvent *event);
+        bool handleEvent(const MidiEvent *event);
     private:
         DacEventHandler *_handler = NULL;
         DacValues _dacValues;

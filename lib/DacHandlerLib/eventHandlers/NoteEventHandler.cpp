@@ -6,7 +6,7 @@ NoteEventHandler::NoteEventHandler(uint8_t channel1, uint8_t channel2)
     _channels[1] = channel2;
 }
 
-bool NoteEventHandler::handleEvent(MidiEvent *event, DacValues *dacValues)
+bool NoteEventHandler::handleEvent(const MidiEvent *event, DacValues *dacValues)
 {
     if (dacValues == nullptr || event == nullptr)
     {
@@ -36,7 +36,7 @@ bool NoteEventHandler::handleEvent(MidiEvent *event, DacValues *dacValues)
     return false;
 }
 
-bool NoteEventHandler::_handleNoteOnEvent(uint8_t index, MidiNoteOnEvent *event, DacValues *dacValues)
+bool NoteEventHandler::_handleNoteOnEvent(uint8_t index, const MidiNoteOnEvent *event, DacValues *dacValues)
 {
     if (_channels[index] == event->channel)
     {
@@ -49,12 +49,14 @@ bool NoteEventHandler::_handleNoteOnEvent(uint8_t index, MidiNoteOnEvent *event,
     return false;
 }
 
-bool NoteEventHandler::_handleNoteOffEvent(uint8_t index, MidiNoteOffEvent *event, DacValues *dacValues)
+bool NoteEventHandler::_handleNoteOffEvent(uint8_t index, const MidiNoteOffEvent *event, DacValues *dacValues)
 {
     if (_channels[index] == event->channel)
     {
         uint8_t tail = _notes.getTail();
         _notes.remove(tail);
+
+        // If the removed note is the same as the event note, send a new note (most recent active note)
         if (tail == event->note)
         {
             dacValues->values[index * 2] = _notes.getTail();
