@@ -7,12 +7,19 @@
 #include <cstdint>
 #endif
 
+#define MIDI_COMMAND_MASK (0x80)
+#define MIDI_CHANNEL_SYSTEM_COMMAND_MASK (0xF0)
+#define MIDI_ON_MASK (0x90)
+#define MIDI_OFF_MASK (0x80)
+#define MIDI_CONTROL_CHANGE_MASK (0xB0)
+#define MIDI_PROGRAM_CHANGE_MASK (0xC0)
+
 enum MIDIEventType
 {
-    NOTE_ON = 0x90,
-    NOTE_OFF = 0x80,
-    PROGRAM_CHANGE = 0xC0,
-    CC = 0xB0,
+    NOTE_ON = MIDI_ON_MASK,
+    NOTE_OFF = MIDI_OFF_MASK,
+    PROGRAM_CHANGE = MIDI_PROGRAM_CHANGE_MASK,
+    CC = MIDI_CONTROL_CHANGE_MASK,
     SYS_EX = 0xF0,
     INVALID = 0xFF,
 };

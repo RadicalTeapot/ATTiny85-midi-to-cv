@@ -1,19 +1,19 @@
-#include <MidiRecv.h>
+#include <MidiParser.h>
 
 #define BAUD_RATE 31250
 
-MidiRecv::MidiRecv(ReceiveOnlySoftwareSerial *serial, uint8_t midiChannel)
+MidiParser::MidiParser(ReceiveOnlySoftwareSerial *serial, uint8_t midiChannel)
 {
     _serial = serial;
     _midiChannel = midiChannel - 1;
 }
 
-void MidiRecv::begin()
+void MidiParser::begin()
 {
     _serial->begin(BAUD_RATE);
 }
 
-bool MidiRecv::recv(MIDI_DATA *data)
+bool MidiParser::recv(MIDI_DATA *data)
 {
     if (_serial->available())
     {
@@ -37,7 +37,7 @@ bool MidiRecv::recv(MIDI_DATA *data)
     return false;
 }
 
-void MidiRecv::parseMidiCommand(uint8_t midiByte)
+void MidiParser::parseMidiCommand(uint8_t midiByte)
 {
     if (isMidiSystemCommand(midiByte))
     {
@@ -50,7 +50,7 @@ void MidiRecv::parseMidiCommand(uint8_t midiByte)
     }
 }
 
-bool MidiRecv::parseMidiData(uint8_t midiByte)
+bool MidiParser::parseMidiData(uint8_t midiByte)
 {
     if (isMatchingMidiOn())
     {

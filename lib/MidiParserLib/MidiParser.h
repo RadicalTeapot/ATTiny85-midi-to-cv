@@ -1,31 +1,19 @@
-#ifndef MIDIRECV_H
-#define MIDIRECV_H
+#ifndef MIDIPARSER_H
+#define MIDIPARSER_H
 
+#include "MidiEvent.h"
 #include <ReceiveOnlySoftwareSerial.h>
 
-#define MIDI_COMMAND_MASK (0x80)
-#define MIDI_CHANNEL_SYSTEM_COMMAND_MASK (0xF0)
-#define MIDI_ON_MASK (0x90)
-#define MIDI_OFF_MASK (0x80)
-#define MIDI_CONTROL_CHANGE_MASK (0xB0)
-
-class MidiRecv {
+class MidiParser {
 public:
-    enum EVENT_TYPE {
-        EVENT_NOTE_ON,
-        EVENT_NOTE_OFF,
-        EVENT_CONTROL_CHANGE,
-        EVENT_NONE
-    };
-
     typedef struct _MIDI_DATA
     {
-        EVENT_TYPE type;
+        MIDIEventType type;
         uint8_t note;
         uint8_t velocity;
     } MIDI_DATA;
 
-    MidiRecv(ReceiveOnlySoftwareSerial *serial, uint8_t midiChannel = 1);
+    MidiParser(ReceiveOnlySoftwareSerial *serial, uint8_t midiChannel = 1);
     void begin();
     bool recv(MIDI_DATA *data);
 private:
@@ -55,7 +43,7 @@ private:
     }
 
     inline void resetMidiData() {
-        _lastMidiData.type = EVENT_NONE;
+        _lastMidiData.type = MIDIEventType::INVALID;
         _lastMidiData.note = 0;
         _lastMidiData.velocity = 0;
     }
