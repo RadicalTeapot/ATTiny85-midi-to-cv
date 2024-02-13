@@ -1,6 +1,7 @@
 #include <unity.h>
 #include "DacHandler.h"
 #include "DacEventHandlerFactory.h"
+#include "MidiEvent.h"
 
 void setUp() {}
 
@@ -8,7 +9,7 @@ void tearDown() {}
 
 void test_DacHandler_handleEvent_nullHandlerPointer_DontHandle() {
     DacHandler dacHandler;
-    MIDINoteOnEvent event = MIDINoteOnEvent(0, 1, 1);
+    const MidiEvent event = {MidiEventType::NOTE_ON, 0, 1, 1};
     TEST_ASSERT_FALSE(dacHandler.handleEvent(&event));
 }
 

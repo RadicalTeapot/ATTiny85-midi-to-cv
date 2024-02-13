@@ -1,9 +1,9 @@
 #ifndef CCEventHandler_h
 #define CCEventHandler_h
 
-#include "eventHandlers/DacEventHandler.h"
-#include <MidiEvent.h>
-#include "../DacValues.h"
+#include "DacEventHandler.h"
+#include "MidiEvent.h"
+#include "DacValues.h"
 
 #define CC_CONFIG_NUMBER 4
 

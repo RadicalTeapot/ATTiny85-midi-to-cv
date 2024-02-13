@@ -1,8 +1,8 @@
 #ifndef DacEventHandler_h
 #define DacEventHandler_h
 
-#include <MIDIEvent.h>
-#include "../DacValues.h"
+#include "MidiEvent.h"
+#include "DacValues.h"
 
 class DacEventHandler {
     public:
