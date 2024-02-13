@@ -10,8 +10,7 @@
 #include "MidiSerialCommunication.h"
 #include "Preset.h"
 
-#define MIDI_IN_PIN (3)
-#define GATE_PIN (4)
+#define MIDI_IN_PIN (1)
 
 #define LOW_MIDI_NOTE (36)
 
@@ -35,8 +34,6 @@ void setup()
 
     dac.begin();
     midiSerial.begin();
-    pinMode(GATE_PIN, OUTPUT);
-    digitalWrite(GATE_PIN, LOW);
 }
 
 void loop()
