@@ -7,7 +7,7 @@
 #include <cstdint>
 #endif
 
-struct DacPresetConfig
+typedef struct
 {
     uint8_t NoteChannels;
     uint8_t CCNumber1;
@@ -16,12 +16,12 @@ struct DacPresetConfig
     uint8_t CCNumber4;
     uint8_t CCChannels1;
     uint8_t CCChannels2;
-};
+} DacPresetConfig;
 
-struct Preset
+typedef struct
 {
     DacPresetConfig dacConfigA;
     DacPresetConfig dacConfigB;
-};
+} Preset;
 
 #endif // Preset_h
