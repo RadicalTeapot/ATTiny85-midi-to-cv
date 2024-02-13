@@ -29,13 +29,13 @@ private:
         return (midiByte & MIDI_CHANNEL_SYSTEM_COMMAND_MASK) == MIDI_CHANNEL_SYSTEM_COMMAND_MASK;
     }
     inline bool isMidiNoteOn() {
-        return _lastMidiCommand & MIDI_ON_MASK == MIDI_ON_MASK;
+        return (_lastMidiCommand & MIDI_ON_MASK) == MIDI_ON_MASK;
     }
     inline bool isMidiNoteOff() {
-        return _lastMidiCommand & MIDI_OFF_MASK == MIDI_OFF_MASK;
+        return (_lastMidiCommand & MIDI_OFF_MASK) == MIDI_OFF_MASK;
     }
     inline bool isMidiCC() {
-        return _lastMidiCommand & MIDI_CONTROL_CHANGE_MASK == MIDI_CONTROL_CHANGE_MASK;
+        return (_lastMidiCommand & MIDI_CONTROL_CHANGE_MASK) == MIDI_CONTROL_CHANGE_MASK;
     }
 
     inline void resetMidiData() {
