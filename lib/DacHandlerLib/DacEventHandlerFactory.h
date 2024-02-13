@@ -6,7 +6,7 @@
 
 class DacEventHandlerFactory {
     public:
-        static DacEventHandler *createEventHandler(DacPresetConfig *dacConfig, bool isNoteHandler);
+        static DacEventHandler *createEventHandler(const DacPresetConfig *dacConfig, bool isNoteHandler);
 };
 
 #endif // DacEventHandlerFactory_h

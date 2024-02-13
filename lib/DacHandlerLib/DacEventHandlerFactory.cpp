@@ -2,7 +2,7 @@
 #include "eventHandlers/NoteEventHandler.h"
 #include "eventHandlers/CCEventHandler.h"
 
-DacEventHandler *DacEventHandlerFactory::createEventHandler(DacPresetConfig *dacConfig, bool isNoteHandler) {
+DacEventHandler *DacEventHandlerFactory::createEventHandler(const DacPresetConfig *dacConfig, bool isNoteHandler) {
     if (isNoteHandler) {
         return new NoteEventHandler(dacConfig->NoteChannels >> 4, dacConfig->NoteChannels & 0x0F);
     } else {

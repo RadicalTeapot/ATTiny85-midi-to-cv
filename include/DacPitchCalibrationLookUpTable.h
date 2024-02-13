@@ -1,8 +1,11 @@
+#ifndef DacPitchCalibrationLookUpTable_h
+#define DacPitchCalibrationLookUpTable_h
+
 #include <Arduino.h>
 
 #define RANGE (56)
 
-const PROGMEM uint16_t lookUpValues[RANGE] = {
+const PROGMEM uint16_t DacPitchCalibrationLookUpTable[RANGE] = {
 0,  // 36
 68,
 138,
@@ -60,3 +63,5 @@ const PROGMEM uint16_t lookUpValues[RANGE] = {
 3860,
 3950 // 91
 };
+
+#endif // DacPitchCalibrationLookUpTable_h
