@@ -22,35 +22,34 @@ private:
 
     inline bool isMidiCommand(uint8_t midiByte)
     {
-        return (midiByte & MIDI_COMMAND_MASK) == MIDI_COMMAND_MASK;
+        return midiByte >> 7 == 1;
     }
     inline bool isMidiSystemCommand(uint8_t midiByte)
     {
-        return (midiByte & MIDI_CHANNEL_SYSTEM_COMMAND_MASK) == MIDI_CHANNEL_SYSTEM_COMMAND_MASK;
+        return (midiByte & MIDI_COMMAND_MASK) == MIDI_CHANNEL_SYSTEM_COMMAND;
     }
     inline bool isMidiNoteOn()
     {
-        return (_lastMidiCommand & MIDI_ON_MASK) == MIDI_ON_MASK;
+        return (_lastMidiCommand & MIDI_COMMAND_MASK) == MIDI_NOTE_ON;
     }
     inline bool isMidiNoteOff()
     {
-        return (_lastMidiCommand & MIDI_OFF_MASK) == MIDI_OFF_MASK;
+        return (_lastMidiCommand & MIDI_COMMAND_MASK) == MIDI_NOTE_OFF;
     }
     inline bool isMidiCC()
     {
-        return (_lastMidiCommand & MIDI_CONTROL_CHANGE_MASK) == MIDI_CONTROL_CHANGE_MASK;
+        return (_lastMidiCommand & MIDI_COMMAND_MASK) == MIDI_CONTROL_CHANGE;
     }
 
     inline void resetMidiData()
     {
-        _lastMidiCommand = MidiEventType::INVALID;
         _midiData[0] = 0;
         _midiData[1] = 0;
     }
 
-    inline void resetLastMidiByte()
+    inline void resetLastMidiCommand()
     {
-        _lastMidiCommand = 0;
+        _lastMidiCommand = MidiEventType::INVALID;
     }
 };
 
