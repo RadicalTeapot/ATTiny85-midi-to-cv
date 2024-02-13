@@ -21,7 +21,7 @@ void MidiParser::parseMidiCommand(uint8_t midiByte)
 {
     if (isMidiSystemCommand(midiByte))
     {
-        resetLastMidiByte();
+        resetLastMidiCommand();
     }
     else // Channel command, store the command and reset note and velocity
     {
