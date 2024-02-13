@@ -57,17 +57,17 @@ bool MidiParser::parseMidiData(uint8_t midiByte, MidiEvent *midiEvent)
         _midiData[1] = midiByte;
         if (isMidiNoteOn() && _midiData[1] != 0)
         {
-            MidiEvent::asNoteOn(midiEvent, getMidiChannel(), _midiData[0], _midiData[1]);
+            MidiEvent::SetNoteOnEventData(midiEvent, getMidiChannel(), _midiData[0], _midiData[1]);
             return true;
         }
         else if (isMidiNoteOff() || (isMidiNoteOn() && _midiData[1] == 0))
         {
-            MidiEvent::asNoteOff(midiEvent, getMidiChannel(), _midiData[0], _midiData[1]);
+            MidiEvent::setNoteOffEventData(midiEvent, getMidiChannel(), _midiData[0], _midiData[1]);
             return true;
         }
         else if (isMidiCC())
         {
-            MidiEvent::asCC(midiEvent, getMidiChannel(), _midiData[0], _midiData[1]);
+            MidiEvent::setCCEventData(midiEvent, getMidiChannel(), _midiData[0], _midiData[1]);
             return true;
         }
     }

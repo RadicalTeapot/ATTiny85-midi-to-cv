@@ -32,26 +32,47 @@ struct MidiEvent
     uint8_t firstByte = 0;
     uint8_t secondByte = 0;
 
-    static void asCC(MidiEvent *event, uint8_t channel, uint8_t number, uint8_t value) {
+    static void setCCEventData(MidiEvent *event, uint8_t channel, uint8_t number, uint8_t value) {
         event->type = CC;
         event->channel = channel;
         event->firstByte = number;
         event->secondByte = value;
     }
 
-    static void asNoteOn(MidiEvent *event, uint8_t channel, uint8_t note, uint8_t velocity) {
+    static void SetNoteOnEventData(MidiEvent *event, uint8_t channel, uint8_t note, uint8_t velocity) {
         event->type = NOTE_ON;
         event->channel = channel;
         event->firstByte = note;
         event->secondByte = velocity;
     }
 
-    static void asNoteOff(MidiEvent *event, uint8_t channel, uint8_t note, uint8_t velocity) {
+    static void setNoteOffEventData(MidiEvent *event, uint8_t channel, uint8_t note, uint8_t velocity) {
         event->type = NOTE_OFF;
         event->channel = channel;
         event->firstByte = note;
         event->secondByte = velocity;
     }
+};
+
+struct MidiNoteOnEvent {
+    MidiEventType type = MidiEventType::NOTE_ON;
+    uint8_t channel = 0;
+    uint8_t note = 0;
+    uint8_t velocity = 0;
+};
+
+struct MidiNoteOffEvent {
+    MidiEventType type = MidiEventType::NOTE_OFF;
+    uint8_t channel = 0;
+    uint8_t note = 0;
+    uint8_t velocity = 0;
+};
+
+struct MidiCCEvent {
+    MidiEventType type = MidiEventType::CC;
+    uint8_t channel = 0;
+    uint8_t number = 0;
+    uint8_t value = 0;
 };
 
 #endif // MidiEvent_h
