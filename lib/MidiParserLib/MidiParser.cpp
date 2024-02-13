@@ -1,33 +1,17 @@
 #include <MidiParser.h>
 
-#define BAUD_RATE 31250
-
-MidiParser::MidiParser(ReceiveOnlySoftwareSerial *serial, uint8_t midiChannel)
+bool MidiParser::parse(uint8_t midiByte, MidiEvent *midiEvent)
 {
-    _serial = serial;
-}
-
-void MidiParser::begin()
-{
-    _serial->begin(BAUD_RATE);
-}
-
-bool MidiParser::recv(MidiEvent *midiEvent)
-{
-    if (_serial->available())
+    if (isMidiCommand(midiByte))
     {
-        uint8_t midiByte = _serial->read();
-        if (isMidiCommand(midiByte))
+        parseMidiCommand(midiByte);
+    }
+    else
+    {
+        if (parseMidiData(midiByte, midiEvent))
         {
-            parseMidiCommand(midiByte);
-        }
-        else
-        {
-            if (parseMidiData(midiByte, midiEvent))
-            {
-                resetMidiData();
-                return true;
-            }
+            resetMidiData();
+            return true;
         }
     }
     return false;

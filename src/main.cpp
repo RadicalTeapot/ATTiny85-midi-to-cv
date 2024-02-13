@@ -7,6 +7,7 @@
 #include "DacHandler.h"
 #include "DacPitchCalibrationLookUpTable.h"
 #include "MidiParser.h"
+#include "MidiSerialCommunication.h"
 #include "Preset.h"
 
 #define MIDI_IN_PIN (3)
@@ -15,8 +16,10 @@
 #define LOW_MIDI_NOTE (36)
 
 ReceiveOnlySoftwareSerial serial(MIDI_IN_PIN);
-MidiParser midi(&serial);
+MidiParser midi;
+MidiSerialCommunication midiSerial(&serial, &midi);
 MidiEvent midiEvent;
+
 Adafruit_MCP4728 dac;
 DacHandler dacHandler;
 
@@ -31,14 +34,14 @@ void setup()
     dacHandler.setHandler(DacEventHandlerFactory::createEventHandler(&preset0.dacConfigA, false));
 
     dac.begin();
-    midi.begin();
+    midiSerial.begin();
     pinMode(GATE_PIN, OUTPUT);
     digitalWrite(GATE_PIN, LOW);
 }
 
 void loop()
 {
-    if (midi.recv(&midiEvent))
+    if (midiSerial.recv(&midiEvent))
     {
         dacHandler.handleEvent(&midiEvent);
     }
