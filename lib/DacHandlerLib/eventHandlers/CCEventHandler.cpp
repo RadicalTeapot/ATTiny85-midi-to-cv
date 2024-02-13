@@ -16,16 +16,16 @@ CCEventHandler::CCEventHandler(
     _cc[3].number = number4;
 }
 
-bool CCEventHandler::handleEvent(MIDIEvent *event, DacValues *dacValues)
+bool CCEventHandler::handleEvent(MidiEvent *event, DacValues *dacValues)
 {
-    if (dacValues == nullptr || event == nullptr || event->type != MIDIEventType::CC)
+    if (dacValues == nullptr || event == nullptr || event->type != MidiEventType::CC)
     {
         return 0;
     }
 
     for (uint8_t i = 0; i < CC_CONFIG_NUMBER; i++)
     {
-        if (_handleEvent(i, (MIDICCEvent *)event, dacValues))
+        if (_handleEvent(i, (MidiCCEvent *)event, dacValues))
         {
             return true;
         }
@@ -33,7 +33,7 @@ bool CCEventHandler::handleEvent(MIDIEvent *event, DacValues *dacValues)
     return false;
 }
 
-bool CCEventHandler::_handleEvent(uint8_t index, MIDICCEvent *event, DacValues *dacValues)
+bool CCEventHandler::_handleEvent(uint8_t index, MidiCCEvent *event, DacValues *dacValues)
 {
     if (_cc[index].channel == event->channel && _cc[index].number == event->number)
     {

@@ -1,30 +1,26 @@
-#ifndef MIDIPARSER_H
-#define MIDIPARSER_H
+#ifndef MidiParser_h
+#define MidiParser_h
 
 #include "MidiEvent.h"
 #include <ReceiveOnlySoftwareSerial.h>
 
 class MidiParser {
 public:
-    typedef struct _MIDI_DATA
-    {
-        MIDIEventType type;
-        uint8_t note;
-        uint8_t velocity;
-    } MIDI_DATA;
-
     MidiParser(ReceiveOnlySoftwareSerial *serial, uint8_t midiChannel = 1);
     void begin();
-    bool recv(MIDI_DATA *data);
+    bool recv(MidiEvent *midiEvent);
 private:
     ReceiveOnlySoftwareSerial *_serial;
 
-    uint8_t _lastMidiByte;
-    uint8_t _midiChannel;
-    MIDI_DATA _lastMidiData;
+    uint8_t _lastMidiCommand;
+    uint8_t _midiData[2];
 
     void parseMidiCommand(uint8_t midiByte);
-    bool parseMidiData(uint8_t midiByte);
+    bool parseMidiData(uint8_t midiByte, MidiEvent *midiEvent);
+
+    inline uint8_t getMidiChannel() {
+        return _lastMidiCommand & MIDI_CHANNEL_COMMAND_MASK;
+    }
 
     inline bool isMidiCommand(uint8_t midiByte) {
         return (midiByte & MIDI_COMMAND_MASK) == MIDI_COMMAND_MASK;
@@ -32,24 +28,25 @@ private:
     inline bool isMidiSystemCommand(uint8_t midiByte) {
         return (midiByte & MIDI_CHANNEL_SYSTEM_COMMAND_MASK) == MIDI_CHANNEL_SYSTEM_COMMAND_MASK;
     }
-    inline bool isMatchingMidiOn() {
-        return _lastMidiByte == (MIDI_ON_MASK | _midiChannel);
+    inline bool isMidiNoteOn() {
+        return _lastMidiCommand & MIDI_ON_MASK == MIDI_ON_MASK;
     }
-    inline bool isMatchingMidiOff() {
-        return _lastMidiByte == (MIDI_OFF_MASK | _midiChannel);
+    inline bool isMidiNoteOff() {
+        return _lastMidiCommand & MIDI_OFF_MASK == MIDI_OFF_MASK;
     }
-    inline bool isMatchingMidiCC() {
-        return _lastMidiByte == (MIDI_CONTROL_CHANGE_MASK | _midiChannel);
+    inline bool isMidiCC() {
+        return _lastMidiCommand & MIDI_CONTROL_CHANGE_MASK == MIDI_CONTROL_CHANGE_MASK;
     }
 
     inline void resetMidiData() {
-        _lastMidiData.type = MIDIEventType::INVALID;
-        _lastMidiData.note = 0;
-        _lastMidiData.velocity = 0;
+        _lastMidiCommand = MidiEventType::INVALID;
+        _midiData[0] = 0;
+        _midiData[1] = 0;
     }
+
     inline void resetLastMidiByte() {
-        _lastMidiByte = 0;
+        _lastMidiCommand = 0;
     }
 };
 
-#endif
+#endif // MidiParser_h

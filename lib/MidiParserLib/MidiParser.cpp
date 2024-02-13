@@ -5,7 +5,6 @@
 MidiParser::MidiParser(ReceiveOnlySoftwareSerial *serial, uint8_t midiChannel)
 {
     _serial = serial;
-    _midiChannel = midiChannel - 1;
 }
 
 void MidiParser::begin()
@@ -13,7 +12,7 @@ void MidiParser::begin()
     _serial->begin(BAUD_RATE);
 }
 
-bool MidiParser::recv(MIDI_DATA *data)
+bool MidiParser::recv(MidiEvent *midiEvent)
 {
     if (_serial->available())
     {
@@ -24,11 +23,8 @@ bool MidiParser::recv(MIDI_DATA *data)
         }
         else
         {
-            if (parseMidiData(midiByte))
+            if (parseMidiData(midiByte, midiEvent))
             {
-                data->note = _lastMidiData.note;
-                data->velocity = _lastMidiData.velocity;
-                data->type = _lastMidiData.type;
                 resetMidiData();
                 return true;
             }
@@ -45,57 +41,33 @@ void MidiParser::parseMidiCommand(uint8_t midiByte)
     }
     else // Channel command, store the command and reset note and velocity
     {
-        _lastMidiByte = midiByte;
+        _lastMidiCommand = midiByte;
         resetMidiData();
     }
 }
 
-bool MidiParser::parseMidiData(uint8_t midiByte)
+bool MidiParser::parseMidiData(uint8_t midiByte, MidiEvent *midiEvent)
 {
-    if (isMatchingMidiOn())
+    if (_midiData[0] == 0)
     {
-        if (_lastMidiData.note == 0)
+        _midiData[0] = midiByte;
+    }
+    else
+    {
+        _midiData[1] = midiByte;
+        if (isMidiNoteOn() && _midiData[1] != 0)
         {
-            _lastMidiData.note = midiByte;
-        }
-        else
-        {
-            _lastMidiData.velocity = midiByte;
-
-            if (_lastMidiData.velocity == 0)
-            {
-                _lastMidiData.type = EVENT_NOTE_OFF;
-            }
-            else
-            {
-                _lastMidiData.type = EVENT_NOTE_ON;
-            }
+            MidiEvent::asNoteOn(midiEvent, getMidiChannel(), _midiData[0], _midiData[1]);
             return true;
         }
-    }
-    else if (isMatchingMidiOff())
-    {
-        if (_lastMidiData.note == 0)
+        else if (isMidiNoteOff() || (isMidiNoteOn() && _midiData[1] == 0))
         {
-            _lastMidiData.note = midiByte;
-        }
-        else
-        {
-            _lastMidiData.velocity = midiByte;
-            _lastMidiData.type = EVENT_NOTE_OFF;
+            MidiEvent::asNoteOff(midiEvent, getMidiChannel(), _midiData[0], _midiData[1]);
             return true;
         }
-    }
-    else if (isMatchingMidiCC())
-    {
-        if (_lastMidiData.note == 0)
+        else if (isMidiCC())
         {
-            _lastMidiData.note = midiByte;
-        }
-        else
-        {
-            _lastMidiData.velocity = midiByte;
-            _lastMidiData.type = EVENT_CONTROL_CHANGE;
+            MidiEvent::asCC(midiEvent, getMidiChannel(), _midiData[0], _midiData[1]);
             return true;
         }
     }

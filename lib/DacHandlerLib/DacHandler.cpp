@@ -13,7 +13,7 @@ void DacHandler::setHandler(DacEventHandler *handler)
     _handler = handler;
 }
 
-bool DacHandler::handleEvent(MIDIEvent *event)
+bool DacHandler::handleEvent(MidiEvent *event)
 {
     if (_handler == nullptr || event == nullptr)
     {

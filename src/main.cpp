@@ -14,7 +14,7 @@
 
 ReceiveOnlySoftwareSerial serial(MIDI_IN_PIN);
 MidiParser midi(&serial);
-MidiParser::MIDI_DATA midiData;
+MidiEvent midiEvent;
 Adafruit_MCP4728 dac;
 DacHandler dacHandler;
 
@@ -35,31 +35,9 @@ void setup()
 
 void loop()
 {
-    if (midi.recv(&midiData))
+    if (midi.recv(&midiEvent))
     {
-        if (midiData.type == MidiParser::EVENT_NOTE_ON)
-        {
-            dac.setChannelValue(MCP4728_CHANNEL_A, remapMidiNote(midiData.note, LOW_MIDI_NOTE));
-            dac.setChannelValue(MCP4728_CHANNEL_B, remapMidiValue(midiData.velocity));
-            digitalWrite(GATE_PIN, HIGH);
-        }
-        else if (midiData.type == MidiParser::EVENT_NOTE_OFF)
-        {
-            dac.setChannelValue(MCP4728_CHANNEL_A, remapMidiNote(midiData.note, LOW_MIDI_NOTE));
-            dac.setChannelValue(MCP4728_CHANNEL_B, remapMidiValue(midiData.velocity));
-            digitalWrite(GATE_PIN, LOW);
-        }
-        else if (midiData.type == MidiParser::EVENT_CONTROL_CHANGE)
-        {
-            if (midiData.note == FIRST_MIDI_CC_NUMBER)
-            {
-                dac.setChannelValue(MCP4728_CHANNEL_C, remapMidiValue(midiData.velocity));
-            }
-            else if (midiData.note == SECOND_MIDI_CC_NUMBER)
-            {
-                dac.setChannelValue(MCP4728_CHANNEL_D, remapMidiValue(midiData.velocity));
-            }
-        }
+        dacHandler.handleEvent(&midiEvent);
     }
 }
 

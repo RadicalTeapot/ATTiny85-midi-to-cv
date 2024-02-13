@@ -6,28 +6,28 @@ NoteEventHandler::NoteEventHandler(uint8_t channel1, uint8_t channel2)
     _channels[1] = channel2;
 }
 
-bool NoteEventHandler::handleEvent(MIDIEvent *event, DacValues *dacValues)
+bool NoteEventHandler::handleEvent(MidiEvent *event, DacValues *dacValues)
 {
     if (dacValues == nullptr || event == nullptr)
     {
         return 0;
     }
 
-    if (event->type == MIDIEventType::NOTE_ON)
+    if (event->type == MidiEventType::NOTE_ON)
     {
         for (uint8_t i = 0; i < NOTE_EVENTS_NUMBER; i++)
         {
-            if (_handleNoteOnEvent(i, (MIDINoteOnEvent *)event, dacValues))
+            if (_handleNoteOnEvent(i, (MidiNoteOnEvent *)event, dacValues))
             {
                 return true;
             }
         }
     }
-    else if (event->type == MIDIEventType::NOTE_OFF)
+    else if (event->type == MidiEventType::NOTE_OFF)
     {
         for (uint8_t i = 0; i < NOTE_EVENTS_NUMBER; i++)
         {
-            if (_handleNoteOffEvent(i, (MIDINoteOffEvent *)event, dacValues))
+            if (_handleNoteOffEvent(i, (MidiNoteOffEvent *)event, dacValues))
             {
                 return true;
             }
@@ -36,7 +36,7 @@ bool NoteEventHandler::handleEvent(MIDIEvent *event, DacValues *dacValues)
     return false;
 }
 
-bool NoteEventHandler::_handleNoteOnEvent(uint8_t index, MIDINoteOnEvent *event, DacValues *dacValues)
+bool NoteEventHandler::_handleNoteOnEvent(uint8_t index, MidiNoteOnEvent *event, DacValues *dacValues)
 {
     if (_channels[index] == event->channel)
     {
@@ -49,7 +49,7 @@ bool NoteEventHandler::_handleNoteOnEvent(uint8_t index, MIDINoteOnEvent *event,
     return false;
 }
 
-bool NoteEventHandler::_handleNoteOffEvent(uint8_t index, MIDINoteOffEvent *event, DacValues *dacValues)
+bool NoteEventHandler::_handleNoteOffEvent(uint8_t index, MidiNoteOffEvent *event, DacValues *dacValues)
 {
     if (_channels[index] == event->channel)
     {

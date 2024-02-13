@@ -1,7 +1,7 @@
 #ifndef DacHandler_h
 #define DacHandler_h
 
-#include <MIDIEvent.h>
+#include <MidiEvent.h>
 #include "DacValues.h"
 #include "eventHandlers/DacEventHandler.h"
 
@@ -13,7 +13,7 @@ class DacHandler {
 
         ~DacHandler();
         void setHandler(DacEventHandler *handler);
-        bool handleEvent(MIDIEvent *event);
+        bool handleEvent(MidiEvent *event);
     private:
         DacEventHandler *_handler = NULL;
         DacValues _dacValues;
