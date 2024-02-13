@@ -11,8 +11,8 @@
 #include "Preset.h"
 
 #define MIDI_IN_PIN (1)
-
 #define LOW_MIDI_NOTE (36)
+#define DAC_A_ADDRESS (0x60)
 
 ReceiveOnlySoftwareSerial serial(MIDI_IN_PIN);
 MidiParser midi;
@@ -30,9 +30,9 @@ void setup()
 {
     // Set dac handler write function
     DacHandler::writeValuesToDac = writeValuesToDac;
-    dacHandler.setHandler(DacEventHandlerFactory::createEventHandler(&preset0.dacConfigA, false));
+    dacHandler.setHandler(DacEventHandlerFactory::createEventHandler(&preset0.dacConfigA, true));
 
-    dac.begin();
+    dac.begin(DAC_A_ADDRESS);
     midiSerial.begin();
 }
 
