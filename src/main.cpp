@@ -11,8 +11,6 @@
 #define GATE_PIN (4)
 
 #define LOW_MIDI_NOTE (36)
-#define FIRST_MIDI_CC_NUMBER (1) // ModWheel CC
-#define SECOND_MIDI_CC_NUMBER (7) // Expression CC
 
 ReceiveOnlySoftwareSerial serial(MIDI_IN_PIN);
 MidiParser midi(&serial);
@@ -81,7 +79,12 @@ uint16_t remapMidiValue(uint8_t midiNote, uint8_t lowerBound, uint8_t upperBound
 
 void writeValuesToDac(DacValues *dacValues)
 {
-    dac.fastWrite(dacValues->values[0], dacValues->values[1], dacValues->values[2], dacValues->values[3]);
+    dac.fastWrite(
+        remapMidiNote(dacValues->values[0], LOW_MIDI_NOTE),
+        remapMidiValue(dacValues->values[1], 0, 1 << 7),
+        remapMidiNote(dacValues->values[2], LOW_MIDI_NOTE),
+        remapMidiValue(dacValues->values[3], 0, 1 << 7)
+    );
 }
 
 #else
