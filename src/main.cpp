@@ -4,6 +4,8 @@
 #include <Adafruit_MCP4728.h>
 #include "calibration.h"
 #include "DacHandler.h"
+#include "DacEventHandlerFactory.h"
+#include "Preset.h"
 
 #define MIDI_IN_PIN (3)
 #define GATE_PIN (4)
@@ -18,6 +20,27 @@ MidiEvent midiEvent;
 Adafruit_MCP4728 dac;
 DacHandler dacHandler;
 
+Preset preset0 = {
+    {
+        0x01, // Note channels
+        0x00, // CC number 1
+        0x01, // CC number 2
+        0x02, // CC number 3
+        0x03, // CC number 4
+        0x00, // CC channels 1
+        0x00, // CC channels 2
+    },
+    {
+        0x23, // Note channels
+        0x04, // CC number 1
+        0x05, // CC number 2
+        0x06, // CC number 3
+        0x07, // CC number 4
+        0x00, // CC channels 1
+        0x00, // CC channels 2
+    }
+};
+
 uint16_t remapMidiNote(uint8_t midiNote, uint8_t lowerMidiNote);
 uint16_t remapMidiValue(uint8_t midiNote, uint8_t lowerBound = 0, uint8_t upperBound = 127);
 void writeValuesToDac(DacValues *dacValues);
@@ -26,6 +49,7 @@ void setup()
 {
     // Set dac handler write function
     DacHandler::writeValuesToDac = writeValuesToDac;
+    dacHandler.setHandler(DacEventHandlerFactory::createEventHandler(&preset0.dacConfigA, false));
 
     dac.begin();
     midi.begin();
