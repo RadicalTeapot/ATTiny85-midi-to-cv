@@ -1,5 +1,7 @@
 #include "DacHandler.h"
 
+DacHandler::WriteValuesToDac DacHandler::writeValuesToDac = DacHandler::defaultWriteValuesToDac;
+
 DacHandler::~DacHandler()
 {
     delete _handler;
@@ -20,10 +22,8 @@ bool DacHandler::handleEvent(MIDIEvent *event)
 
     if (_handler->handleEvent(event, &_dacValues))
     {
-        writeValuesToDac();
+        writeValuesToDac(&_dacValues);
         return true;
     }
     return false;
 }
-
-void DacHandler::writeValuesToDac() {}
