@@ -1,10 +1,11 @@
 #ifdef ARDUINO
 #include <Arduino.h>
-#include <MidiParser.h>
 #include <Adafruit_MCP4728.h>
+
 #include "calibration.h"
-#include "DacHandler.h"
 #include "DacEventHandlerFactory.h"
+#include "DacHandler.h"
+#include "MidiParser.h"
 #include "Preset.h"
 
 #define MIDI_IN_PIN (3)
