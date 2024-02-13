@@ -113,10 +113,14 @@ void test_NoteEventHandler_midiNoteOnEvent_MatchingChannelAndNumberAndValue_Vali
     noteEventHandler->handleEvent(&noteOnEvent, &dacValues);
     TEST_ASSERT_EQUAL(2, dacValues.values[0]); // note
     TEST_ASSERT_EQUAL(1, dacValues.values[1]); // velocity
+    TEST_ASSERT_EQUAL(0, dacValues.values[2]); // note
+    TEST_ASSERT_EQUAL(0, dacValues.values[3]); // velocity
 
     // test match second midi channel
     noteOnEvent = {MidiEventType::NOTE_ON, 1, 2, 1};
     noteEventHandler->handleEvent(&noteOnEvent, &dacValues);
+    TEST_ASSERT_EQUAL(2, dacValues.values[0]); // note
+    TEST_ASSERT_EQUAL(1, dacValues.values[1]); // velocity
     TEST_ASSERT_EQUAL(2, dacValues.values[2]); // note
     TEST_ASSERT_EQUAL(1, dacValues.values[3]); // velocity
 }
@@ -133,12 +137,16 @@ void test_NoteEventHandler_midiNoteOffEvent_MatchingChannelAndNumberAndValue_Val
     noteEventHandler->handleEvent(&noteOffEvent, &dacValues);
     TEST_ASSERT_EQUAL(0, dacValues.values[0]); // note
     TEST_ASSERT_EQUAL(1, dacValues.values[1]); // velocity
+    TEST_ASSERT_EQUAL(0, dacValues.values[2]); // note
+    TEST_ASSERT_EQUAL(0, dacValues.values[3]); // velocity
 
     // test match second midi channel
     noteOnEvent = {MidiEventType::NOTE_ON, 1, 2, 1};
     noteEventHandler->handleEvent(&noteOnEvent, &dacValues);
     noteOffEvent = {MidiEventType::NOTE_OFF, 1, 2, 1};
     noteEventHandler->handleEvent(&noteOffEvent, &dacValues);
+    TEST_ASSERT_EQUAL(0, dacValues.values[0]); // note
+    TEST_ASSERT_EQUAL(1, dacValues.values[1]); // velocity
     TEST_ASSERT_EQUAL(0, dacValues.values[2]); // note
     TEST_ASSERT_EQUAL(1, dacValues.values[3]); // velocity
 }
@@ -178,6 +186,32 @@ void test_NoteEventHandler_midiNoteOffEvent_legatoOutOfOrder_ValidDacEvent()
     TEST_ASSERT_EQUAL(0, dacValues.values[2]); // note
 }
 
+void test_NoteEventHandler_midiNoteOffEvent_successiveNotes_ValidDacEvent()
+{
+    NoteEventHandler *noteEventHandler = new NoteEventHandler(0, 1);
+    DacValues dacValues;
+
+    // Same notes
+    MidiEvent noteOnEvent = {MidiEventType::NOTE_ON, 0, 2, 1};
+    noteEventHandler->handleEvent(&noteOnEvent, &dacValues);
+    MidiEvent noteOffEvent = {MidiEventType::NOTE_OFF, 0, 2, 1};
+    noteEventHandler->handleEvent(&noteOffEvent, &dacValues);
+    noteEventHandler->handleEvent(&noteOnEvent, &dacValues);
+    noteEventHandler->handleEvent(&noteOffEvent, &dacValues);
+    TEST_ASSERT_EQUAL(0, dacValues.values[0]); // note
+
+    // Different notes
+    noteOnEvent = {MidiEventType::NOTE_ON, 0, 3, 1};
+    noteEventHandler->handleEvent(&noteOnEvent, &dacValues);
+    noteOffEvent = {MidiEventType::NOTE_OFF, 0, 3, 1};
+    noteEventHandler->handleEvent(&noteOffEvent, &dacValues);
+    noteOnEvent = {MidiEventType::NOTE_ON, 0, 4, 1};
+    noteEventHandler->handleEvent(&noteOnEvent, &dacValues);
+    noteOffEvent = {MidiEventType::NOTE_OFF, 0, 4, 1};
+    noteEventHandler->handleEvent(&noteOffEvent, &dacValues);
+    TEST_ASSERT_EQUAL(0, dacValues.values[0]); // note
+}
+
 int main()
 {
     UNITY_BEGIN();
@@ -192,5 +226,6 @@ int main()
     RUN_TEST(test_NoteEventHandler_midiNoteOffEvent_MatchingChannelAndNumberAndValue_ValidDacEvent);
     RUN_TEST(test_NoteEventHandler_midiNoteOffEvent_legatoInOrder_ValidDacEvent);
     RUN_TEST(test_NoteEventHandler_midiNoteOffEvent_legatoOutOfOrder_ValidDacEvent);
+    RUN_TEST(test_NoteEventHandler_midiNoteOffEvent_successiveNotes_ValidDacEvent);
     UNITY_END();
 }

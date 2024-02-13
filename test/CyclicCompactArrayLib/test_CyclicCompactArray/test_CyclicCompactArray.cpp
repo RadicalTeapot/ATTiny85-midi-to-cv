@@ -73,16 +73,29 @@ void test_CyclicCompactArray_remove_wrapping() {
     TEST_ASSERT_EQUAL(3, cyclicCompactArray.getTail());
 }
 
-void test_CyclicCompactArray_resetToZero() {
+void test_CyclicCompactArray_resetToZero_single() {
     CyclicCompactArray<2> cyclicCompactArray;
     cyclicCompactArray.append(1);
     cyclicCompactArray.remove(1);
     TEST_ASSERT_EQUAL(0, cyclicCompactArray.getTail());
+}
 
+void test_CyclicCompactArray_resetToZero_legato() {
+    CyclicCompactArray<2> cyclicCompactArray;
     cyclicCompactArray.append(1);
     cyclicCompactArray.append(2);
     cyclicCompactArray.remove(2);
     cyclicCompactArray.remove(1);
+    TEST_ASSERT_EQUAL(0, cyclicCompactArray.getTail());
+}
+
+void test_CyclicCompactArray_resetToZero_successive()
+{
+    CyclicCompactArray<4> cyclicCompactArray;
+    cyclicCompactArray.append(1);
+    cyclicCompactArray.remove(1);
+    cyclicCompactArray.append(2);
+    cyclicCompactArray.remove(2);
     TEST_ASSERT_EQUAL(0, cyclicCompactArray.getTail());
 }
 
@@ -95,6 +108,8 @@ int main() {
     RUN_TEST(test_CyclicCompactArray_remove_full);
     RUN_TEST(test_CyclicCompactArray_remove_notFull);
     RUN_TEST(test_CyclicCompactArray_remove_wrapping);
-    RUN_TEST(test_CyclicCompactArray_resetToZero);
+    RUN_TEST(test_CyclicCompactArray_resetToZero_single);
+    RUN_TEST(test_CyclicCompactArray_resetToZero_legato);
+    RUN_TEST(test_CyclicCompactArray_resetToZero_successive);
     UNITY_END();
 }
