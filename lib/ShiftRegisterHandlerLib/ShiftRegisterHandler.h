@@ -1,10 +1,9 @@
 #ifndef ShiftRegisterHandler_h
 #define ShiftRegisterHandler_h
 
+#include "Preset.h"
 #include "MidiEvent.h"
-#include "EventHandlers/ShiftRegisterEventHandler.h"
-
-#define HANDLER_COUNT 3
+#include "ShiftRegisterEventHandlerContainer.h"
 
 class ShiftRegisterHandler
 {
@@ -12,12 +11,12 @@ public:
     typedef void (*WriteValuesToShiftRegister)(uint8_t values);
     static WriteValuesToShiftRegister writeValuesToShiftRegister;
 
-    // TODO set event handlers
-    bool handleEvent(const MidiEvent *event);
-private:
-    ShiftRegisterEventHandler *_handlers;
-    uint8_t shiftRegisterValues = 0B00000000;
+    void updateHandlersFromFirstDacConfig(const DacPresetConfig *dacConfig, bool isNoteHandler);
+    void updateHandlersFromSecondDacConfig(const DacPresetConfig *dacConfig, bool isNoteHandler);
+    void processEvent(const MidiEvent *event) const;
 
+private:
+    ShiftRegisterEventHandlerContainer _handlerContainer;
     static void defaultWriteValuesToShiftRegister(uint8_t values) {}
 };
 
