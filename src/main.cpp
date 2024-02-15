@@ -9,6 +9,7 @@
 #include "MidiParser.h"
 #include "MidiSerialCommunication.h"
 #include "Preset.h"
+#include "ShiftRegisterHandler.h"
 
 #define MIDI_IN_PIN (1)
 #define LOW_MIDI_NOTE (36)
@@ -21,16 +22,22 @@ MidiEvent midiEvent;
 
 Adafruit_MCP4728 dac;
 DacHandler dacHandler;
+ShiftRegisterHandler shiftRegisterHandler;
 
 uint16_t remapMidiNote(uint8_t midiNote, uint8_t lowerMidiNote);
 uint16_t remapMidiValue(uint8_t midiNote, uint8_t lowerBound = 0, uint8_t upperBound = 127);
 void writeValuesToDac(DacValues *dacValues);
+void writeValuesToShiftRegister(uint8_t values);
 
 void setup()
 {
     // Set dac handler write function
     DacHandler::writeValuesToDac = writeValuesToDac;
     dacHandler.setHandler(DacEventHandlerFactory::createEventHandler(&preset0.dacConfigA, true));
+
+    shiftRegisterHandler.updateHandlersFromFirstDacConfig(&preset0.dacConfigA, true);
+    shiftRegisterHandler.updateHandlersFromSecondDacConfig(&preset0.dacConfigB, true);
+    shiftRegisterHandler.writeValuesToShiftRegister = writeValuesToShiftRegister;
 
     dac.begin(DAC_A_ADDRESS);
     midiSerial.begin();
@@ -41,6 +48,7 @@ void loop()
     if (midiSerial.recv(&midiEvent))
     {
         dacHandler.handleEvent(&midiEvent);
+        shiftRegisterHandler.processEvent(&midiEvent);
     }
 }
 
@@ -64,6 +72,11 @@ void writeValuesToDac(DacValues *dacValues)
         remapMidiNote(dacValues->values[2], LOW_MIDI_NOTE),
         remapMidiValue(dacValues->values[3], 0, 1 << 7)
     );
+}
+
+void writeValuesToShiftRegister(uint8_t values)
+{
+    // TODO Send message to slave ATTiny85
 }
 
 #else
