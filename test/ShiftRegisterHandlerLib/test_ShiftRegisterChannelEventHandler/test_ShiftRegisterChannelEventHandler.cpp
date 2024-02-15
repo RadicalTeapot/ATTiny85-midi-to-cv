@@ -7,11 +7,11 @@ void tearDown() {}
 
 void test_DacPitchModeHandler_ValidEvents_ValidOutput()
 {
-    ShiftRegisterChannelEventHandler<0> handler;
+    ShiftRegisterChannelEventHandler handler(0);
     MidiEvent noteOnEvent = {MidiEventType::NOTE_ON, 0, 1, 1};
-    TEST_ASSERT_TRUE(handler.handleEvent(&noteOnEvent));
+    TEST_ASSERT_TRUE(handler.processEvent(&noteOnEvent));
     MidiEvent noteOffEvent = {MidiEventType::NOTE_OFF, 0, 1, 1};
-    TEST_ASSERT_FALSE(handler.handleEvent(&noteOffEvent));
+    TEST_ASSERT_FALSE(handler.processEvent(&noteOffEvent));
 }
 
 // TODO Write more tests

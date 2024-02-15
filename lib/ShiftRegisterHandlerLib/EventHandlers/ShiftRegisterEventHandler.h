@@ -5,7 +5,8 @@
 
 class ShiftRegisterEventHandler {
 public:
-    virtual bool handleEvent(const MidiEvent *event) = 0;
+    virtual ~ShiftRegisterEventHandler() {}
+    virtual bool processEvent(const MidiEvent *event) = 0;
 };
 
 #endif // ShiftRegisterEventHandler_h

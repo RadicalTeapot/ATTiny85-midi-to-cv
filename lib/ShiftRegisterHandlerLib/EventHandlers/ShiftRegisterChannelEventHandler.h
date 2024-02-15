@@ -4,11 +4,11 @@
 #include "MidiEvent.h"
 #include "ShiftRegisterEventHandler.h"
 
-template<uint8_t channel>
 class ShiftRegisterChannelEventHandler : public ShiftRegisterEventHandler
 {
 public:
-    bool handleEvent(const MidiEvent *event)
+    ShiftRegisterChannelEventHandler(uint8_t channel) : _channel(channel) {}
+    bool processEvent(const MidiEvent *event)
     {
         if (shouldHandleEvent(event))
         {
@@ -16,10 +16,13 @@ public:
         }
         return _currentChannelState;
     }
+
 private:
+    uint8_t _channel;
     bool _currentChannelState = false;
-    inline bool shouldHandleEvent(const MidiEvent *event) {
-        return event->channel == channel && (event->type == MidiEventType::NOTE_ON || event->type == MidiEventType::NOTE_OFF);
+    inline bool shouldHandleEvent(const MidiEvent *event) const
+    {
+        return event->channel == _channel && (event->type == MidiEventType::NOTE_ON || event->type == MidiEventType::NOTE_OFF);
     }
 };
 
