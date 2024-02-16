@@ -46,8 +46,7 @@ void test_DacHandler_handleEvent_nullMidiEventPointer_DontHandle() {
 }
 
 void test_DacHandler_MidiNoteOnEvent_handleEvent() {
-    DacHandler dacHandler;
-    DacHandler::writeValuesToDac = mock_writeValuesToDac;
+    DacHandler dacHandler(mock_writeValuesToDac);
     DacEventHandler *eventHandler = DacEventHandlerFactory::createEventHandler(&dacPresetConfig, true);
     dacHandler.setHandler(eventHandler);
 
