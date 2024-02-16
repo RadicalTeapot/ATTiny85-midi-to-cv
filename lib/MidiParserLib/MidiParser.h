@@ -9,8 +9,8 @@ public:
     bool parse(uint8_t midiByte, MidiEvent *midiEvent);
 
 private:
-    uint8_t _lastMidiCommand;
-    uint8_t _midiData[2];
+    uint8_t _lastMidiCommand = 0;
+    uint8_t _midiData[2] = {0, 0};
 
     void parseMidiCommand(uint8_t midiByte);
     bool parseMidiData(uint8_t midiByte, MidiEvent *midiEvent);

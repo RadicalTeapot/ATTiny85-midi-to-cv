@@ -10,7 +10,7 @@ public:
     ShiftRegisterChannelEventHandler(uint8_t channel) : _channel(channel) {}
 private:
     uint8_t _channel;
-    inline bool shouldProcessEvent(const MidiEvent *event) const
+    inline bool shouldProcessEvent(const MidiEvent *event) const override
     {
         return event->channel == _channel && (event->type == MidiEventType::NOTE_ON || event->type == MidiEventType::NOTE_OFF);
     }
