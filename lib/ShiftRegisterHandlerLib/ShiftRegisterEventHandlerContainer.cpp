@@ -38,15 +38,16 @@ void ShiftRegisterEventHandlerContainer::setSecondTwoHandlersFromDacConfig(const
     }
 }
 
-uint8_t ShiftRegisterEventHandlerContainer::processEvent(const MidiEvent *event) const
+void ShiftRegisterEventHandlerContainer::processEvent(const MidiEvent *event, uint8_t *state) const
 {
-    uint8_t result = 0;
+    uint8_t maskedPreviousState = 0;
     for (int i = 0; i < 8; ++i)
     {
-        if (handlers[i] && handlers[i]->processEvent(event))
+        maskedPreviousState = (*state >> i) & 1;
+        *state &= ~(1 << i);
+        if (handlers[i] && handlers[i]->processEvent(event, &maskedPreviousState))
         {
-            result |= (1 << i);
+            *state |= (1 << i);
         }
     }
-    return result;
 }

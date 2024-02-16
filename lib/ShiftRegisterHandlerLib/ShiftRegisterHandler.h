@@ -13,9 +13,10 @@ public:
 
     void updateHandlersFromFirstDacConfig(const DacPresetConfig *dacConfig, bool isNoteHandler);
     void updateHandlersFromSecondDacConfig(const DacPresetConfig *dacConfig, bool isNoteHandler);
-    void processEvent(const MidiEvent *event) const;
+    void processEvent(const MidiEvent *event);
 
 private:
+    uint8_t _state = 0;
     ShiftRegisterEventHandlerContainer _handlerContainer;
     static void defaultWriteValuesToShiftRegister(uint8_t values) {}
 };
