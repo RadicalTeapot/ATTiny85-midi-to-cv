@@ -5,15 +5,22 @@
 #include <ReceiveOnlySoftwareSerial.h>
 #include "MidiParser.h"
 
-class MidiSerialCommunication
+namespace MidiSerialCommunication
 {
-public:
-    MidiSerialCommunication(ReceiveOnlySoftwareSerial *serial, MidiParser *parser);
-    void begin();
-    bool recv(MidiEvent *midiEvent);
-private:
-    ReceiveOnlySoftwareSerial *_serial;
-    MidiParser *_parser;
-};
+    template <uint16_t baudRate>
+    void begin(ReceiveOnlySoftwareSerial *serial)
+    {
+        serial->begin(baudRate);
+    }
+
+    bool recv(MidiEvent *midiEvent, ReceiveOnlySoftwareSerial *serial, MidiParser *parser)
+    {
+        if (serial->available())
+        {
+            return parser->parse(serial->read(), midiEvent);
+        }
+        return false;
+    }
+}
 
 #endif // MidiSerialCommunication_h

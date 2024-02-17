@@ -12,19 +12,20 @@
 #include "ShiftRegisterHandler.h"
 #include "SwitchHandler.h"
 
-#define MIDI_IN_PIN (1)
-#define SWITCH_A_PIN (3)
-#define SWITCH_B_PIN (4)
-#define LOW_MIDI_NOTE (36)
-#define DAC_A_ADDRESS (0x60)
-#define DAC_B_ADDRESS (0x61)
-#define SLAVE_ADDRESS (0x62)
+#define BAUD_RATE (31250U)
 
-#define DAC_COUNT (2)
+#define MIDI_IN_PIN (1U)
+#define SWITCH_A_PIN (3U)
+#define SWITCH_B_PIN (4U)
+#define LOW_MIDI_NOTE (36U)
+#define DAC_A_ADDRESS (0x60U)
+#define DAC_B_ADDRESS (0x61U)
+#define SLAVE_ADDRESS (0x62U)
+
+#define DAC_COUNT (2U)
 
 ReceiveOnlySoftwareSerial serial(MIDI_IN_PIN);
-MidiParser midi;
-MidiSerialCommunication midiSerial(&serial, &midi);
+MidiParser midiParser;
 MidiEvent midiEvent;
 
 Adafruit_MCP4728 DACs[DAC_COUNT];
@@ -61,7 +62,7 @@ void setup()
     DACs[0].begin(DAC_A_ADDRESS);
     DACs[1] = Adafruit_MCP4728();
     DACs[1].begin(DAC_B_ADDRESS);
-    midiSerial.begin();
+    MidiSerialCommunication::begin<BAUD_RATE>(&serial);
 }
 
 void loop()
@@ -76,7 +77,7 @@ void loop()
         previousSwitchesState = switchesState;
     }
 
-    if (midiSerial.recv(&midiEvent))
+    if (MidiSerialCommunication::recv(&midiEvent, &serial, &midiParser))
     {
         dacHandlers[0].handleEvent(&midiEvent);
         dacHandlers[1].handleEvent(&midiEvent);
