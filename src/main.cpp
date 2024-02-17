@@ -13,6 +13,7 @@
 #include "SwitchHandler.h"
 
 #define BAUD_RATE (31250U)
+#define MIDI_MAX_VALUE (127U)
 
 #define MIDI_IN_PIN (1U)
 #define SWITCH_A_PIN (3U)
@@ -35,8 +36,6 @@ ShiftRegisterHandler shiftRegisterHandler;
 
 uint8_t switchesState = 0, previousSwitchesState = 0;
 
-static inline uint16_t remapMidiNote(uint8_t midiNote, uint8_t lowerMidiNote);
-static inline uint16_t remapMidiValue(uint8_t midiNote, uint8_t lowerBound = 0, uint8_t upperBound = 127);
 static void writeValuesToFirstDac(DacValues *dacValues);
 static void writeValuesToSecondDac(DacValues *dacValues);
 static void writeValuesToShiftRegister(uint8_t values);
@@ -85,34 +84,36 @@ void loop()
     }
 }
 
-static inline uint16_t remapMidiNote(uint8_t midiNote, uint8_t lowerMidiNote)
+template <uint8_t lowerMidiNote, uint8_t range>
+static inline uint16_t remapMidiNote(uint8_t midiNote)
 {
-    return pgm_read_word_near(DacPitchCalibrationLookUpTable + min(midiNote - lowerMidiNote, RANGE - 1));
+    return pgm_read_word_near(DacPitchCalibrationLookUpTable + min(midiNote - lowerMidiNote, range - 1));
 }
 
-static inline uint16_t remapMidiValue(uint8_t midiNote, uint8_t lowerBound, uint8_t upperBound)
+template <uint8_t lowerBound, uint8_t upperBound>
+static inline uint16_t remapMidiValue(uint8_t midiNote)
 {
-    return map(midiNote, lowerBound, upperBound, 0, 4095);
+    return (midiNote - lowerBound) * 4095U / (upperBound - lowerBound);
 }
+
+static void writeValuesToDac(DacValues *dacValues, uint8_t dacIndex)
+{
+    DACs[dacIndex].fastWrite(
+        remapMidiNote<LOW_MIDI_NOTE, RANGE>(dacValues->values[0]),
+        remapMidiValue<0, MIDI_MAX_VALUE>(dacValues->values[1]),
+        remapMidiNote<LOW_MIDI_NOTE, RANGE>(dacValues->values[2]),
+        remapMidiValue<0, MIDI_MAX_VALUE>(dacValues->values[3])
+    );
+};
 
 static void writeValuesToFirstDac(DacValues *dacValues)
 {
-    DACs[0].fastWrite(
-        remapMidiNote(dacValues->values[0], LOW_MIDI_NOTE),
-        remapMidiValue(dacValues->values[1], 0, 1 << 7),
-        remapMidiNote(dacValues->values[2], LOW_MIDI_NOTE),
-        remapMidiValue(dacValues->values[3], 0, 1 << 7)
-    );
+    writeValuesToDac(dacValues, 0);
 }
 
 static void writeValuesToSecondDac(DacValues *dacValues)
 {
-    DACs[1].fastWrite(
-        remapMidiNote(dacValues->values[0], LOW_MIDI_NOTE),
-        remapMidiValue(dacValues->values[1], 0, 1 << 7),
-        remapMidiNote(dacValues->values[2], LOW_MIDI_NOTE),
-        remapMidiValue(dacValues->values[3], 0, 1 << 7)
-    );
+    writeValuesToDac(dacValues, 1);
 }
 
 void writeValuesToShiftRegister(uint8_t values)
