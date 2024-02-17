@@ -1,11 +1,18 @@
 #ifndef DacPitchCalibrationLookUpTable_h
 #define DacPitchCalibrationLookUpTable_h
 
+#ifdef ARDUINO
 #include <Arduino.h>
+#endif
 
 #define RANGE (56)
 
-const PROGMEM uint16_t DacPitchCalibrationLookUpTable[RANGE] = {
+#ifdef ARDUINO
+const PROGMEM uint16_t DacPitchCalibrationLookUpTable[RANGE]
+#else
+const uint16_t DacPitchCalibrationLookUpTable[RANGE]
+#endif
+= {
 0,  // 36
 68,
 138,
