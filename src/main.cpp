@@ -10,11 +10,15 @@
 #include "MidiSerialCommunication.h"
 #include "Preset.h"
 #include "ShiftRegisterHandler.h"
+#include "SwitchHandler.h"
 
 #define MIDI_IN_PIN (1)
+#define SWITCH_A_PIN (3)
+#define SWITCH_B_PIN (4)
 #define LOW_MIDI_NOTE (36)
 #define DAC_A_ADDRESS (0x60)
 #define DAC_B_ADDRESS (0x61)
+#define SLAVE_ADDRESS (0x62)
 
 #define DAC_COUNT (2)
 
@@ -28,6 +32,8 @@ DacHandler dacHandlers[DAC_COUNT];
 
 ShiftRegisterHandler shiftRegisterHandler;
 
+uint8_t switchesState = 0, previousSwitchesState = 0;
+
 static inline uint16_t remapMidiNote(uint8_t midiNote, uint8_t lowerMidiNote);
 static inline uint16_t remapMidiValue(uint8_t midiNote, uint8_t lowerBound = 0, uint8_t upperBound = 127);
 static void writeValuesToFirstDac(DacValues *dacValues);
@@ -36,15 +42,19 @@ static void writeValuesToShiftRegister(uint8_t values);
 
 void setup()
 {
+    SwitchHandler::initSwitches<SWITCH_A_PIN, SWITCH_B_PIN>();
+    SwitchHandler::getSwitchesState<SWITCH_A_PIN, SWITCH_B_PIN>(&switchesState);
+    previousSwitchesState = switchesState;
+
     // Set dac handler write function
     dacHandlers[0] = DacHandler(writeValuesToFirstDac);
-    dacHandlers[0].setHandler(DacEventHandlerFactory::createEventHandler(&preset0.dacConfigA, true));
+    dacHandlers[0].setHandler(DacEventHandlerFactory::createEventHandler(&preset0.dacConfigA, switchesState & 1));
 
     dacHandlers[1] = DacHandler(writeValuesToSecondDac);
-    dacHandlers[1].setHandler(DacEventHandlerFactory::createEventHandler(&preset0.dacConfigB, true));
+    dacHandlers[1].setHandler(DacEventHandlerFactory::createEventHandler(&preset0.dacConfigB, switchesState & 2));
 
-    shiftRegisterHandler.updateHandlersFromFirstDacConfig(&preset0.dacConfigA, true);
-    shiftRegisterHandler.updateHandlersFromSecondDacConfig(&preset0.dacConfigB, true);
+    shiftRegisterHandler.updateHandlersFromFirstDacConfig(&preset0.dacConfigA, switchesState & 1);
+    shiftRegisterHandler.updateHandlersFromSecondDacConfig(&preset0.dacConfigB, switchesState & 2);
     shiftRegisterHandler.writeValuesToShiftRegister = writeValuesToShiftRegister;
 
     DACs[0] = Adafruit_MCP4728();
@@ -56,6 +66,16 @@ void setup()
 
 void loop()
 {
+    SwitchHandler::getSwitchesState<SWITCH_A_PIN, SWITCH_B_PIN>(&switchesState);
+    if (switchesState != previousSwitchesState)
+    {
+        dacHandlers[0].setHandler(DacEventHandlerFactory::createEventHandler(&preset0.dacConfigA, switchesState & 1));
+        dacHandlers[1].setHandler(DacEventHandlerFactory::createEventHandler(&preset0.dacConfigB, switchesState & 2));
+        shiftRegisterHandler.updateHandlersFromFirstDacConfig(&preset0.dacConfigA, switchesState & 1);
+        shiftRegisterHandler.updateHandlersFromSecondDacConfig(&preset0.dacConfigB, switchesState & 2);
+        previousSwitchesState = switchesState;
+    }
+
     if (midiSerial.recv(&midiEvent))
     {
         dacHandlers[0].handleEvent(&midiEvent);
