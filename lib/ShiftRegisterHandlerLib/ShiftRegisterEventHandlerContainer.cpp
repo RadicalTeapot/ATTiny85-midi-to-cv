@@ -2,52 +2,49 @@
 
 ShiftRegisterEventHandlerContainer::ShiftRegisterEventHandlerContainer()
 {
-    for (int i = 0; i < 8; ++i)
+    uint8_t i = HANDLER_COUNT;
+    do
     {
-        handlers[i] = new ShiftRegisterNoteEventHandler<DEFAULT_CHANNEL>(notes[i]);
-    }
+        i--;
+        _handlers[i] = new ShiftRegisterEventHandler(shouldProcessNoteEvent<DEFAULT_CHANNEL>, _notes[i]);
+    } while (i);
 }
 
 ShiftRegisterEventHandlerContainer::~ShiftRegisterEventHandlerContainer()
 {
-    for (int i = 0; i < 8; ++i)
+    uint8_t i = HANDLER_COUNT;
+    do
     {
-        delete handlers[i];
-    }
+        i--;
+        delete _handlers[i];
+    } while (i);
 }
 
-void ShiftRegisterEventHandlerContainer::setFirstTwoHandlersFromDacConfig(const DacPresetConfig *dacConfig, bool isNoteHandler)
+void ShiftRegisterEventHandlerContainer::setHandlersFromDacConfig(const DacPresetConfig *dacConfig, bool isNoteHandler, uint8_t index)
 {
     if (isNoteHandler)
     {
-        delete handlers[0];
-        handlers[0] = new ShiftRegisterChannelEventHandler(dacConfig->NoteChannels >> 4);
-        delete handlers[1];
-        handlers[1] = new ShiftRegisterChannelEventHandler(dacConfig->NoteChannels & 0x0F);
-    }
-}
-
-void ShiftRegisterEventHandlerContainer::setSecondTwoHandlersFromDacConfig(const DacPresetConfig *dacConfig, bool isNoteHandler)
-{
-    if (isNoteHandler)
-    {
-        delete handlers[2];
-        handlers[2] = new ShiftRegisterChannelEventHandler(dacConfig->NoteChannels >> 4);
-        delete handlers[3];
-        handlers[3] = new ShiftRegisterChannelEventHandler(dacConfig->NoteChannels & 0x0F);
+        _handlers[index]->setShouldProcessEvent(shouldProcessChannelEvent, dacConfig->NoteChannels >> 4);
+        _handlers[index+1]->setShouldProcessEvent(shouldProcessChannelEvent, dacConfig->NoteChannels & 0x0F);
+    } else {
+        _handlers[index]->setShouldProcessEvent(shouldProcessNoteEvent<DEFAULT_CHANNEL>, _notes[index]);
+        _handlers[index+1]->setShouldProcessEvent(shouldProcessNoteEvent<DEFAULT_CHANNEL>, _notes[index+1]);
     }
 }
 
 void ShiftRegisterEventHandlerContainer::processEvent(const MidiEvent *event, uint8_t *state) const
 {
     uint8_t maskedPreviousState = 0;
-    for (int i = 0; i < 8; ++i)
+    uint8_t i = 8, j = 0;
+    do
     {
-        maskedPreviousState = (*state >> i) & 1;
-        *state &= ~(1 << i);
-        if (handlers[i] && handlers[i]->processEvent(event, &maskedPreviousState))
+        i--;
+        j = (uint8_t)(1 << i);
+        maskedPreviousState = (uint8_t)((*state >> i) & 1);
+        *state &= ~j;
+        if (_handlers[i] && _handlers[i]->processEvent(event, &maskedPreviousState))
         {
-            *state |= (1 << i);
+            *state |= j;
         }
-    }
+    } while (i);
 }

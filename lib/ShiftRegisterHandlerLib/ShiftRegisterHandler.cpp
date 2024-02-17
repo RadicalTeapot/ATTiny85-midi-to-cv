@@ -4,12 +4,12 @@ ShiftRegisterHandler::WriteValuesToShiftRegister ShiftRegisterHandler::writeValu
 
 void ShiftRegisterHandler::updateHandlersFromFirstDacConfig(const DacPresetConfig *dacConfig, bool isNoteHandler)
 {
-    _handlerContainer.setFirstTwoHandlersFromDacConfig(dacConfig, isNoteHandler);
+    _handlerContainer.setFirstHandlersPairFromDacConfig(dacConfig, isNoteHandler);
 }
 
 void ShiftRegisterHandler::updateHandlersFromSecondDacConfig(const DacPresetConfig *dacConfig, bool isNoteHandler)
 {
-    _handlerContainer.setSecondTwoHandlersFromDacConfig(dacConfig, isNoteHandler);
+    _handlerContainer.setSecondHandlersPairFromDacConfig(dacConfig, isNoteHandler);
 }
 
 void ShiftRegisterHandler::processEvent(const MidiEvent *event)

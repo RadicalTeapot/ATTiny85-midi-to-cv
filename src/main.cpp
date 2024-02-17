@@ -28,11 +28,11 @@ DacHandler dacHandlers[DAC_COUNT];
 
 ShiftRegisterHandler shiftRegisterHandler;
 
-uint16_t remapMidiNote(uint8_t midiNote, uint8_t lowerMidiNote);
-uint16_t remapMidiValue(uint8_t midiNote, uint8_t lowerBound = 0, uint8_t upperBound = 127);
-void writeValuesToFirstDac(DacValues *dacValues);
-void writeValuesToSecondDac(DacValues *dacValues);
-void writeValuesToShiftRegister(uint8_t values);
+static inline uint16_t remapMidiNote(uint8_t midiNote, uint8_t lowerMidiNote);
+static inline uint16_t remapMidiValue(uint8_t midiNote, uint8_t lowerBound = 0, uint8_t upperBound = 127);
+static void writeValuesToFirstDac(DacValues *dacValues);
+static void writeValuesToSecondDac(DacValues *dacValues);
+static void writeValuesToShiftRegister(uint8_t values);
 
 void setup()
 {
@@ -64,19 +64,17 @@ void loop()
     }
 }
 
-uint16_t remapMidiNote(uint8_t midiNote, uint8_t lowerMidiNote)
+static inline uint16_t remapMidiNote(uint8_t midiNote, uint8_t lowerMidiNote)
 {
-    uint16_t remappedNote = pgm_read_word_near(DacPitchCalibrationLookUpTable + min(midiNote - lowerMidiNote, RANGE - 1));
-    return remappedNote;
+    return pgm_read_word_near(DacPitchCalibrationLookUpTable + min(midiNote - lowerMidiNote, RANGE - 1));
 }
 
-uint16_t remapMidiValue(uint8_t midiNote, uint8_t lowerBound, uint8_t upperBound)
+static inline uint16_t remapMidiValue(uint8_t midiNote, uint8_t lowerBound, uint8_t upperBound)
 {
-    uint16_t remappedNote = map(midiNote, lowerBound, upperBound, 0, 4095);
-    return remappedNote;
+    return map(midiNote, lowerBound, upperBound, 0, 4095);
 }
 
-void writeValuesToFirstDac(DacValues *dacValues)
+static void writeValuesToFirstDac(DacValues *dacValues)
 {
     DACs[0].fastWrite(
         remapMidiNote(dacValues->values[0], LOW_MIDI_NOTE),
@@ -86,7 +84,7 @@ void writeValuesToFirstDac(DacValues *dacValues)
     );
 }
 
-void writeValuesToSecondDac(DacValues *dacValues)
+static void writeValuesToSecondDac(DacValues *dacValues)
 {
     DACs[1].fastWrite(
         remapMidiNote(dacValues->values[0], LOW_MIDI_NOTE),
