@@ -30,10 +30,13 @@ void test_CCEventHandler_midiCCEvent_MatchingChannelAndNumber_Handle()
     DacValues dacValues;
     MidiEvent ccEvent = {MidiEventType::CC, 1, 1, 1};
     TEST_ASSERT_TRUE(ccEventHandler->handleEvent(&ccEvent, &dacValues));
+    TEST_ASSERT_EQUAL(1, dacValues.values[0]);
     ccEvent = {MidiEventType::CC, 2, 2, 1};
     TEST_ASSERT_TRUE(ccEventHandler->handleEvent(&ccEvent, &dacValues));
+    TEST_ASSERT_EQUAL(1, dacValues.values[1]);
     ccEvent = {MidiEventType::CC, 3, 3, 1};
     TEST_ASSERT_TRUE(ccEventHandler->handleEvent(&ccEvent, &dacValues));
+    TEST_ASSERT_EQUAL(1, dacValues.values[2]);
 }
 
 void test_CCEventHandler_NullMidiEventPointer_DontHandle()

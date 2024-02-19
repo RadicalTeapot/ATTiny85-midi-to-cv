@@ -20,6 +20,7 @@ void test_DacEventHandlerFactory_createNoteEventHandler() {
 
 void test_DacEventHandlerFactory_createCCEventHandler() {
     DacPresetConfig dacConfig;
+    dacConfig.CCChannels1 = 0x00;
     dacConfig.CCNumber1 = 1;
     DacEventHandler *ccEventHandler = DacEventHandlerFactory::createEventHandler(&dacConfig, false);
     TEST_ASSERT_NOT_NULL(ccEventHandler);
