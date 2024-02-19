@@ -2,9 +2,9 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-#define LATCH_PIN (0) // Connect to ST_CP (RCLK, pin 12)
-#define CLOCK_PIN (1) // Connect to SH_CP (SRCLK, pin 11)
-#define DATA_PIN (2)  // Connect to DS (SER, pin 14)
+#define LATCH_PIN (1) // Connect to ST_CP (RCLK, pin 12)
+#define CLOCK_PIN (3) // Connect to SH_CP (SRCLK, pin 11)
+#define DATA_PIN (4)  // Connect to DS (SER, pin 14)
 
 void receiveCallback(uint8_t data);
 void handleReceive(int len);
