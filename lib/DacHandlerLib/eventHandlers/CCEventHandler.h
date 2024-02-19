@@ -18,7 +18,7 @@ class CCEventHandler : public DacEventHandler
         CCEventHandler(uint8_t channel1, uint8_t number1, uint8_t channel2, uint8_t number2, uint8_t channel3, uint8_t number3, uint8_t channel4, uint8_t number4);
         bool handleEvent(const MidiEvent *event, DacValues *dacValues);
     private:
-        bool _handleEvent(uint8_t index, const MidiCCEvent *event, DacValues *dacValues);
+        bool _handleEvent(uint8_t index, const MidiCCEvent *event, DacValues *dacValues) const;
         CCConfig _cc[CC_CONFIG_NUMBER];
 };
 

@@ -20,20 +20,23 @@ bool CCEventHandler::handleEvent(const MidiEvent *event, DacValues *dacValues)
 {
     if (dacValues == nullptr || event == nullptr || event->type != MidiEventType::CC)
     {
-        return 0;
+        return false;
     }
 
-    for (uint8_t i = 0; i < CC_CONFIG_NUMBER; i++)
+    uint8_t i = CC_CONFIG_NUMBER;
+    do
     {
+        i--;
         if (_handleEvent(i, (MidiCCEvent *)event, dacValues))
         {
             return true;
         }
-    }
+    } while (i);
+
     return false;
 }
 
-bool CCEventHandler::_handleEvent(uint8_t index, const MidiCCEvent *event, DacValues *dacValues)
+bool CCEventHandler::_handleEvent(uint8_t index, const MidiCCEvent *event, DacValues *dacValues) const
 {
     if (_cc[index].channel == event->channel && _cc[index].number == event->number)
     {
