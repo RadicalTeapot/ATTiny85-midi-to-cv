@@ -41,7 +41,7 @@ bool MidiParser::parseMidiData(uint8_t midiByte, MidiEvent *midiEvent)
         _midiData[1] = midiByte;
         if (isMidiNoteOn() && _midiData[1] != 0)
         {
-            MidiEvent::SetNoteOnEventData(midiEvent, getMidiChannel(), _midiData[0], _midiData[1]);
+            MidiEvent::setNoteOnEventData(midiEvent, getMidiChannel(), _midiData[0], _midiData[1]);
             return true;
         }
         else if (isMidiNoteOff() || (isMidiNoteOn() && _midiData[1] == 0))

@@ -39,7 +39,7 @@ struct MidiEvent
         event->secondByte = value;
     }
 
-    static void SetNoteOnEventData(MidiEvent *event, uint8_t channel, uint8_t note, uint8_t velocity) {
+    static void setNoteOnEventData(MidiEvent *event, uint8_t channel, uint8_t note, uint8_t velocity) {
         event->type = NOTE_ON;
         event->channel = channel;
         event->firstByte = note;
