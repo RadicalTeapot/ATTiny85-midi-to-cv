@@ -19,7 +19,7 @@ namespace SwitchHandler
     template <uint8_t pinA, uint8_t pinB>
     void getSwitchesState(uint8_t *state)
     {
-        *state = (digitalRead(pinA) << 1) | digitalRead(pinB);
+        *state = (digitalRead(pinB) << 1) | digitalRead(pinA);
     }
 }
 
