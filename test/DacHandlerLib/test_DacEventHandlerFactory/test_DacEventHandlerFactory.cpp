@@ -11,9 +11,11 @@ void test_DacEventHandlerFactory_createNoteEventHandler() {
     DacEventHandler *noteEventHandler = DacEventHandlerFactory::createEventHandler(&dacConfig, true);
     TEST_ASSERT_NOT_NULL(noteEventHandler);
 
-    const MidiEvent noteOnEvent = {MidiEventType::NOTE_ON, 0, 1, 1};
+    const MidiEvent noteOnEvent = {MidiEventType::NOTE_ON, 0, 1, 2};
     DacValues dacValues;
     TEST_ASSERT_TRUE(noteEventHandler->handleEvent(&noteOnEvent, &dacValues));
+    TEST_ASSERT_EQUAL(1, dacValues.values[0]);
+    TEST_ASSERT_EQUAL(2, dacValues.values[1]);
 }
 
 void test_DacEventHandlerFactory_createCCEventHandler() {
@@ -25,6 +27,7 @@ void test_DacEventHandlerFactory_createCCEventHandler() {
     const MidiEvent ccEvent = {MidiEventType::CC, 0, 1, 1};
     DacValues dacValues;
     TEST_ASSERT_TRUE(ccEventHandler->handleEvent(&ccEvent, &dacValues));
+    TEST_ASSERT_EQUAL(1, dacValues.values[0]);
 }
 
 int main() {
