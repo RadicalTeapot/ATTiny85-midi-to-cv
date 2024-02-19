@@ -97,7 +97,7 @@ static inline uint16_t remapMidiNote(uint8_t midiNote)
 template <uint8_t lowerBound, uint8_t upperBound>
 static inline uint16_t remapMidiValue(uint8_t midiNote)
 {
-    return (midiNote - lowerBound) * 4095U / (upperBound - lowerBound);
+    return static_cast<uint32_t>(midiNote - lowerBound) * 4095U / (upperBound - lowerBound);
 }
 
 static void writeValuesToDac(DacValues *dacValues, uint8_t dacIndex)
