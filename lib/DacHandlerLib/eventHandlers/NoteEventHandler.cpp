@@ -15,23 +15,27 @@ bool NoteEventHandler::handleEvent(const MidiEvent *event, DacValues *dacValues)
 
     if (event->type == MidiEventType::NOTE_ON)
     {
-        for (uint8_t i = 0; i < NOTE_EVENTS_NUMBER; i++)
+        uint8_t i = NOTE_EVENTS_NUMBER;
+        do
         {
+            i--;
             if (_handleNoteOnEvent(i, (MidiNoteOnEvent *)event, dacValues))
             {
                 return true;
             }
-        }
+        } while (i);
     }
     else if (event->type == MidiEventType::NOTE_OFF)
     {
-        for (uint8_t i = 0; i < NOTE_EVENTS_NUMBER; i++)
+        uint8_t i = NOTE_EVENTS_NUMBER;
+        do
         {
+            i--;
             if (_handleNoteOffEvent(i, (MidiNoteOffEvent *)event, dacValues))
             {
                 return true;
             }
-        }
+        } while (i);
     }
     return false;
 }
