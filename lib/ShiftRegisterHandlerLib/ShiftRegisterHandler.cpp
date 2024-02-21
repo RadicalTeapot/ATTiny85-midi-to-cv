@@ -14,6 +14,6 @@ void ShiftRegisterHandler::updateHandlersFromSecondDacConfig(const DacPresetConf
 
 void ShiftRegisterHandler::processEvent(const MidiEvent *event)
 {
-    _handlerContainer.processEvent(event, &_state);
+    _state = _handlerContainer.processEvent(event, _state);
     writeValuesToShiftRegister(_state);
 }

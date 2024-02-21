@@ -14,11 +14,11 @@ public:
         _shouldProcessEvent = shouldProcessEvent;
         _checkedValue = checkedValue;
     }
-    inline bool processEvent(const MidiEvent *event, const uint8_t *result) const
+    inline bool processEvent(const MidiEvent *event, const uint8_t result) const
     {
         if (_shouldProcessEvent(event, _checkedValue))
             return event->type == MidiEventType::NOTE_ON;
-        return *result == 1;
+        return result == 1;
     }
 private:
     ShouldProcessEventFunc _shouldProcessEvent;

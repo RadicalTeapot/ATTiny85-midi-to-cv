@@ -24,7 +24,7 @@ public:
     void setSecondHandlersPairFromDacConfig(const DacPresetConfig *dacConfig, bool isNoteHandler) {
         setHandlersFromDacConfig(dacConfig, isNoteHandler, 2);
     }
-    void processEvent(const MidiEvent *event, uint8_t *state) const;
+    uint8_t processEvent(const MidiEvent *event, const uint8_t previousState) const;
 
 private:
     ShiftRegisterEventHandler *_handlers[HANDLER_COUNT];
