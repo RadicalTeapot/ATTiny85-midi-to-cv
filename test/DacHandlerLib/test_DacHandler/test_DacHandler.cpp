@@ -40,14 +40,16 @@ void test_DacHandler_handleEvent_nullHandlerPointer_DontHandle() {
 void test_DacHandler_handleEvent_nullMidiEventPointer_DontHandle() {
     DacHandler dacHandler;
     DacPresetConfig dacConfig;
-    DacEventHandler *eventHandler = DacEventHandlerFactory::createEventHandler(&dacConfig, true);
+    DacEventHandlerFactory::Factory factory;
+    DacEventHandler *eventHandler = factory.createEventHandler(&dacConfig, true);
     dacHandler.setHandler(eventHandler);
     TEST_ASSERT_FALSE(dacHandler.handleEvent(nullptr));
 }
 
 void test_DacHandler_MidiNoteOnEvent_handleEvent() {
+    DacEventHandlerFactory::Factory factory;
     DacHandler dacHandler(mock_writeValuesToDac);
-    DacEventHandler *eventHandler = DacEventHandlerFactory::createEventHandler(&dacPresetConfig, true);
+    DacEventHandler *eventHandler = factory.createEventHandler(&dacPresetConfig, true);
     dacHandler.setHandler(eventHandler);
 
     const MidiEvent event = {MidiEventType::NOTE_ON, 0, 1, 1};

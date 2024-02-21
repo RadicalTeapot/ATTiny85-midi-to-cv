@@ -5,7 +5,6 @@
 #include "DefaultPresets.h"
 #include "DacEventHandlerFactory.h"
 #include "DacHandler.h"
-#include "DacPitchCalibrationLookUpTable.h"
 #include "MidiParser.h"
 #include "MidiSerialCommunication.h"
 #include "Preset.h"
@@ -31,14 +30,19 @@ MidiEvent midiEvent;
 
 Adafruit_MCP4728 DACs[DAC_COUNT];
 DacHandler dacHandlers[DAC_COUNT];
+DacEventHandlerFactory::Factory dacEventHandlerFactory;
 
 ShiftRegisterHandler shiftRegisterHandler;
 
 uint8_t switchesState = 0, previousSwitchesState = 0;
 
-static void writeValuesToFirstDac(DacValues *dacValues);
-static void writeValuesToSecondDac(DacValues *dacValues);
 static void writeValuesToShiftRegister(uint8_t values);
+
+template<uint8_t dacIndex>
+static void writeValuesToDac(DacValues *dacValues)
+{
+    DACs[dacIndex].fastWrite(dacValues->values[0], dacValues->values[1], dacValues->values[2], dacValues->values[3]);
+};
 
 void setup()
 {
@@ -46,12 +50,20 @@ void setup()
     SwitchHandler::getSwitchesState<SWITCH_A_PIN, SWITCH_B_PIN>(&switchesState);
     previousSwitchesState = switchesState;
 
-    // Set dac handler write function
-    dacHandlers[0] = DacHandler(writeValuesToFirstDac);
-    dacHandlers[0].setHandler(DacEventHandlerFactory::createEventHandler(&preset0.dacConfigA, switchesState & 1));
+    dacEventHandlerFactory = DacEventHandlerFactory::Factory(
+        &DacEventHandlerFactory::dacNoteValueMapper<LOW_MIDI_NOTE, RANGE, MIDI_MAX_VALUE>,
+        &DacEventHandlerFactory::dacCCValueMapper<MIDI_MAX_VALUE>);
 
+    // Set dac handler write function
+    const uint8_t firstDacIndex = 0;
+    DacHandler::WriteValuesToDac writeValuesToFirstDac = &writeValuesToDac<firstDacIndex>;
+    dacHandlers[0] = DacHandler(writeValuesToFirstDac);
+    dacHandlers[0].setHandler(dacEventHandlerFactory.createEventHandler(&preset0.dacConfigA, switchesState & 1));
+
+    const uint8_t secondDacIndex = 1;
+    DacHandler::WriteValuesToDac writeValuesToSecondDac = &writeValuesToDac<secondDacIndex>;
     dacHandlers[1] = DacHandler(writeValuesToSecondDac);
-    dacHandlers[1].setHandler(DacEventHandlerFactory::createEventHandler(&preset0.dacConfigB, switchesState & 2));
+    dacHandlers[1].setHandler(dacEventHandlerFactory.createEventHandler(&preset0.dacConfigB, switchesState & 2));
 
     shiftRegisterHandler.updateHandlersFromFirstDacConfig(&preset0.dacConfigA, switchesState & 1);
     shiftRegisterHandler.updateHandlersFromSecondDacConfig(&preset0.dacConfigB, switchesState & 2);
@@ -73,8 +85,8 @@ void loop()
     SwitchHandler::getSwitchesState<SWITCH_A_PIN, SWITCH_B_PIN>(&switchesState);
     if (switchesState != previousSwitchesState)
     {
-        dacHandlers[0].setHandler(DacEventHandlerFactory::createEventHandler(&preset0.dacConfigA, switchesState & 1));
-        dacHandlers[1].setHandler(DacEventHandlerFactory::createEventHandler(&preset0.dacConfigB, switchesState & 2));
+        dacHandlers[0].setHandler(dacEventHandlerFactory.createEventHandler(&preset0.dacConfigA, switchesState & 1));
+        dacHandlers[1].setHandler(dacEventHandlerFactory.createEventHandler(&preset0.dacConfigB, switchesState & 2));
         shiftRegisterHandler.updateHandlersFromFirstDacConfig(&preset0.dacConfigA, switchesState & 1);
         shiftRegisterHandler.updateHandlersFromSecondDacConfig(&preset0.dacConfigB, switchesState & 2);
         previousSwitchesState = switchesState;
@@ -86,38 +98,6 @@ void loop()
         dacHandlers[1].handleEvent(&midiEvent);
         shiftRegisterHandler.processEvent(&midiEvent);
     }
-}
-
-template <uint8_t lowerMidiNote, uint8_t range>
-static inline uint16_t remapMidiNote(uint8_t midiNote)
-{
-    return pgm_read_word_near(DacPitchCalibrationLookUpTable + min(midiNote - lowerMidiNote, range - 1));
-}
-
-template <uint8_t lowerBound, uint8_t upperBound>
-static inline uint16_t remapMidiValue(uint8_t midiNote)
-{
-    return static_cast<uint32_t>(midiNote - lowerBound) * 4095U / (upperBound - lowerBound);
-}
-
-static void writeValuesToDac(DacValues *dacValues, uint8_t dacIndex)
-{
-    DACs[dacIndex].fastWrite(
-        remapMidiNote<LOW_MIDI_NOTE, RANGE>(dacValues->values[0]),
-        remapMidiValue<0, MIDI_MAX_VALUE>(dacValues->values[1]),
-        remapMidiNote<LOW_MIDI_NOTE, RANGE>(dacValues->values[2]),
-        remapMidiValue<0, MIDI_MAX_VALUE>(dacValues->values[3])
-    );
-};
-
-static void writeValuesToFirstDac(DacValues *dacValues)
-{
-    writeValuesToDac(dacValues, 0);
-}
-
-static void writeValuesToSecondDac(DacValues *dacValues)
-{
-    writeValuesToDac(dacValues, 1);
 }
 
 void writeValuesToShiftRegister(uint8_t values)

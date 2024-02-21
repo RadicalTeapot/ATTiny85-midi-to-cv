@@ -8,7 +8,8 @@ void tearDown() {}
 
 void test_DacEventHandlerFactory_createNoteEventHandler() {
     DacPresetConfig dacConfig;
-    DacEventHandler *noteEventHandler = DacEventHandlerFactory::createEventHandler(&dacConfig, true);
+    DacEventHandlerFactory::Factory factory;
+    DacEventHandler *noteEventHandler = factory.createEventHandler(&dacConfig, true);
     TEST_ASSERT_NOT_NULL(noteEventHandler);
 
     const MidiEvent noteOnEvent = {MidiEventType::NOTE_ON, 0, 1, 2};
@@ -22,7 +23,8 @@ void test_DacEventHandlerFactory_createCCEventHandler() {
     DacPresetConfig dacConfig;
     dacConfig.CCChannels1 = 0x00;
     dacConfig.CCNumber1 = 1;
-    DacEventHandler *ccEventHandler = DacEventHandlerFactory::createEventHandler(&dacConfig, false);
+    DacEventHandlerFactory::Factory factory;
+    DacEventHandler *ccEventHandler = factory.createEventHandler(&dacConfig, false);
     TEST_ASSERT_NOT_NULL(ccEventHandler);
 
     const MidiEvent ccEvent = {MidiEventType::CC, 0, 1, 1};
@@ -30,6 +32,8 @@ void test_DacEventHandlerFactory_createCCEventHandler() {
     TEST_ASSERT_TRUE(ccEventHandler->handleEvent(&ccEvent, &dacValues));
     TEST_ASSERT_EQUAL(1, dacValues.values[0]);
 }
+
+// TODO test various mapping functions
 
 int main() {
     UNITY_BEGIN();
