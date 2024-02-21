@@ -52,12 +52,12 @@ void test_ShiftRegisterEventHandlerContainer_setFirstHandlersPairFromDacConfig()
     ShiftRegisterEventHandlerContainer container;
     container.setFirstHandlersPairFromDacConfig(&preset0.dacConfigA, true);
 
-    MidiEvent midiEvent = {MidiEventType::NOTE_ON, (uint8_t)(preset0.dacConfigA.NoteChannels >> 4), 0, 0};
+    MidiEvent midiEvent = {MidiEventType::NOTE_ON, preset0.dacConfigA.NoteChannels >> 4U, 0, 0};
     TEST_ASSERT_EQUAL(0B00000001, container.processEvent(&midiEvent, 0));
     midiEvent.type = MidiEventType::NOTE_OFF;
     TEST_ASSERT_EQUAL(0B00000000, container.processEvent(&midiEvent, 0));
 
-    midiEvent.channel = preset0.dacConfigA.NoteChannels & 0x0F;
+    midiEvent = {MidiEventType::NOTE_ON, preset0.dacConfigA.NoteChannels & 0x0F, 0, 0};
     TEST_ASSERT_EQUAL(0B00000010, container.processEvent(&midiEvent, 0));
     midiEvent.type = MidiEventType::NOTE_OFF;
     TEST_ASSERT_EQUAL(0B00000000, container.processEvent(&midiEvent, 0));
@@ -73,7 +73,7 @@ void test_ShiftRegisterEventHandlerContainer_setSecondHandlersPairFromDacConfig(
     midiEvent.type = MidiEventType::NOTE_OFF;
     TEST_ASSERT_EQUAL(0B00000000, container.processEvent(&midiEvent, 0));
 
-    midiEvent.channel = preset0.dacConfigB.NoteChannels & 0x0F;
+    midiEvent = {MidiEventType::NOTE_ON, preset0.dacConfigB.NoteChannels & 0x0F, 0, 0};
     TEST_ASSERT_EQUAL(0B00001000, container.processEvent(&midiEvent, 0));
     midiEvent.type = MidiEventType::NOTE_OFF;
     TEST_ASSERT_EQUAL(0B00000000, container.processEvent(&midiEvent, 0));
