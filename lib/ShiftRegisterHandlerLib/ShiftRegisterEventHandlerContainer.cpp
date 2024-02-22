@@ -2,21 +2,12 @@
 
 ShiftRegisterEventHandlerContainer::ShiftRegisterEventHandlerContainer()
 {
+    // TODO This should probably be in an init function rather than the constructor
     uint8_t i = HANDLER_COUNT;
     do
     {
         i--;
-        _handlers[i] = new ShiftRegisterEventHandler(shouldProcessNoteEvent<DEFAULT_CHANNEL>, _notes[i]);
-    } while (i);
-}
-
-ShiftRegisterEventHandlerContainer::~ShiftRegisterEventHandlerContainer()
-{
-    uint8_t i = HANDLER_COUNT;
-    do
-    {
-        i--;
-        delete _handlers[i];
+        _handlers[i] = ShiftRegisterEventHandler(shouldProcessNoteEvent<DEFAULT_CHANNEL>, DEFAULT_NOTES[i]);
     } while (i);
 }
 
@@ -24,11 +15,13 @@ void ShiftRegisterEventHandlerContainer::setHandlersFromDacConfig(const DacPrese
 {
     if (isNoteHandler)
     {
-        _handlers[index]->setShouldProcessEvent(shouldProcessChannelEvent, dacConfig->NoteChannels >> 4);
-        _handlers[index+1]->setShouldProcessEvent(shouldProcessChannelEvent, dacConfig->NoteChannels & 0x0F);
-    } else {
-        _handlers[index]->setShouldProcessEvent(shouldProcessNoteEvent<DEFAULT_CHANNEL>, _notes[index]);
-        _handlers[index+1]->setShouldProcessEvent(shouldProcessNoteEvent<DEFAULT_CHANNEL>, _notes[index+1]);
+        _handlers[index].setShouldProcessEvent(shouldProcessChannelEvent, dacConfig->NoteChannels >> 4);
+        _handlers[index + 1].setShouldProcessEvent(shouldProcessChannelEvent, dacConfig->NoteChannels & 0x0F);
+    }
+    else
+    {
+        _handlers[index].setShouldProcessEvent(shouldProcessNoteEvent<DEFAULT_CHANNEL>, DEFAULT_NOTES[index]);
+        _handlers[index + 1].setShouldProcessEvent(shouldProcessNoteEvent<DEFAULT_CHANNEL>, DEFAULT_NOTES[index + 1]);
     }
 }
 
@@ -41,7 +34,7 @@ uint8_t ShiftRegisterEventHandlerContainer::processEvent(const MidiEvent *event,
         i--;
         mask = 1U << i;
         maskedPreviousState = (previousState >> i) & 1U;
-        if (_handlers[i] && _handlers[i]->processEvent(event, maskedPreviousState))
+        if (_handlers[i].processEvent(event, maskedPreviousState))
         {
             result |= mask;
         }
