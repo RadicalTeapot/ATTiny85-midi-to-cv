@@ -11,17 +11,12 @@
 
 namespace DacEventHandlerFactory
 {
-    static void defaultDacValueMapper(const uint8_t[4], DacValues *dacValues);
     class Factory
     {
     public:
-        Factory(DacValueMapper noteValueMapper = defaultDacValueMapper, DacValueMapper ccValueMapper = defaultDacValueMapper)
-            : _noteValueMapper(noteValueMapper), _ccValueMapper(ccValueMapper) {}
-        DacEventHandler *createEventHandler(const DacPresetConfig *dacConfig, bool isNoteHandler);
-
-    private:
-        DacValueMapper _noteValueMapper;
-        DacValueMapper _ccValueMapper;
+        static DacValueMapper noteValueMapper;
+        static DacValueMapper ccValueMapper;
+        static DacEventHandler *createEventHandler(const DacPresetConfig *dacConfig, bool isNoteHandler);
     };
 
     static inline void defaultDacValueMapper(const uint8_t values[4], DacValues *dacValues)

@@ -4,16 +4,19 @@
 
 namespace DacEventHandlerFactory
 {
+    DacValueMapper Factory::noteValueMapper = defaultDacValueMapper;
+    DacValueMapper Factory::ccValueMapper = defaultDacValueMapper;
+
     DacEventHandler *Factory::createEventHandler(const DacPresetConfig *dacConfig, bool isNoteHandler)
     {
         if (isNoteHandler)
         {
-            return new NoteEventHandler(_noteValueMapper, dacConfig->NoteChannels >> 4, dacConfig->NoteChannels & 0x0F);
+            return new NoteEventHandler(noteValueMapper, dacConfig->NoteChannels >> 4, dacConfig->NoteChannels & 0x0F);
         }
         else
         {
             return new CCEventHandler(
-                _ccValueMapper,
+                ccValueMapper,
                 dacConfig->CCChannels1 >> 4, dacConfig->CCNumber1,
                 dacConfig->CCChannels1 & 0x0F, dacConfig->CCNumber2,
                 dacConfig->CCChannels2 >> 4, dacConfig->CCNumber3,

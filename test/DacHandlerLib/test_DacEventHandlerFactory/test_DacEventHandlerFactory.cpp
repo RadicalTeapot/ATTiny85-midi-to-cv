@@ -8,8 +8,7 @@ void tearDown() {}
 
 void test_DacEventHandlerFactory_createNoteEventHandler() {
     DacPresetConfig dacConfig;
-    DacEventHandlerFactory::Factory factory;
-    DacEventHandler *noteEventHandler = factory.createEventHandler(&dacConfig, true);
+    DacEventHandler *noteEventHandler = DacEventHandlerFactory::Factory::createEventHandler(&dacConfig, true);
     TEST_ASSERT_NOT_NULL(noteEventHandler);
 
     const MidiEvent noteOnEvent = {MidiEventType::NOTE_ON, 0, 1, 2};
@@ -23,8 +22,7 @@ void test_DacEventHandlerFactory_createCCEventHandler() {
     DacPresetConfig dacConfig;
     dacConfig.CCChannels1 = 0x00;
     dacConfig.CCNumber1 = 1;
-    DacEventHandlerFactory::Factory factory;
-    DacEventHandler *ccEventHandler = factory.createEventHandler(&dacConfig, false);
+    DacEventHandler *ccEventHandler = DacEventHandlerFactory::Factory::createEventHandler(&dacConfig, false);
     TEST_ASSERT_NOT_NULL(ccEventHandler);
 
     const MidiEvent ccEvent = {MidiEventType::CC, 0, 1, 1};
