@@ -6,90 +6,76 @@ void setUp() {}
 
 void tearDown() {}
 
-class MockValueRemapper: public IValueRemapper
-{
-public:
-    inline uint16_t remapCC(uint8_t value) const override { return value; }
-    inline uint16_t remapNote(uint8_t value) const override { return value; }
-    inline uint16_t remapVelocity(uint8_t value) const override { return value; }
-};
-
 void test_NoteEventHandler_midiCCEvent_dontHandle()
 {
-    MockValueRemapper valueRemapper;
-    NoteEventHandler noteEventHandler = NoteEventHandler(0, 1, &valueRemapper);
-    DacValues dacValues;
+    NoteEventHandler noteEventHandler;
+    uint16_t values[2] = {0, 0};
     const MidiEvent ccEvent = {MidiEventType::CC, 1, 1, 1};
-
-    TEST_ASSERT_FALSE(noteEventHandler.handleEvent(&ccEvent, &dacValues));
+    TEST_ASSERT_FALSE(noteEventHandler.handleEvent(&ccEvent, &values[0]));
 }
 
 void test_NoteEventHandler_midiNoteOnEvent_Handle()
 {
-    MockValueRemapper valueRemapper;
-    NoteEventHandler noteEventHandler = NoteEventHandler(0, 1, &valueRemapper);
-    DacValues dacValues;
+    NoteEventHandler noteEventHandler;
+    uint16_t values[2] = {0, 0};
     const MidiEvent noteOnEvent = {MidiEventType::NOTE_ON, 0, 1, 1};
-    TEST_ASSERT_TRUE(noteEventHandler.handleEvent(&noteOnEvent, &dacValues));
+    TEST_ASSERT_TRUE(noteEventHandler.handleEvent(&noteOnEvent, &values[0]));
 }
 
 void test_NoteEventHandler_midiNoteOffEventWithMatchingNoteOnEvent_Handle()
 {
-    MockValueRemapper valueRemapper;
-    NoteEventHandler noteEventHandler = NoteEventHandler(0, 1, &valueRemapper);
-    DacValues dacValues;
+    NoteEventHandler noteEventHandler;
+    uint16_t values[2] = {0, 0};
     MidiEvent noteOnEvent = {MidiEventType::NOTE_ON, 0, 1, 1};
     MidiEvent noteOffEvent = {MidiEventType::NOTE_OFF, 0, 1, 1};
 
     // test simple matching
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
-    TEST_ASSERT_TRUE(noteEventHandler.handleEvent(&noteOffEvent, &dacValues));
+    noteEventHandler.handleEvent(&noteOnEvent, &values[0]);
+    TEST_ASSERT_TRUE(noteEventHandler.handleEvent(&noteOffEvent, &values[0]));
 
     // test matching of latest note on
     noteOnEvent = {MidiEventType::NOTE_ON, 0, 1, 1};
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
+    noteEventHandler.handleEvent(&noteOnEvent, &values[0]);
     noteOnEvent = {MidiEventType::NOTE_ON, 0, 2, 1};
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
+    noteEventHandler.handleEvent(&noteOnEvent, &values[0]);
     noteOffEvent = {MidiEventType::NOTE_OFF, 0, 2, 1};
-    TEST_ASSERT_TRUE(noteEventHandler.handleEvent(&noteOffEvent, &dacValues));
+    TEST_ASSERT_TRUE(noteEventHandler.handleEvent(&noteOffEvent, &values[0]));
 }
 
 void test_NoteEventHandler_midiNoteOffEventWithNotMatchingNoteOnEvent_DontHandle()
 {
-    MockValueRemapper valueRemapper;
-    NoteEventHandler noteEventHandler = NoteEventHandler(0, 1, &valueRemapper);
-    DacValues dacValues;
+    NoteEventHandler noteEventHandler;
+    uint16_t values[2] = {0, 0};
 
     // test no note on event
     MidiEvent noteOffEvent = {MidiEventType::NOTE_OFF, 0, 1, 1};
-    TEST_ASSERT_FALSE(noteEventHandler.handleEvent(&noteOffEvent, &dacValues));
+    TEST_ASSERT_FALSE(noteEventHandler.handleEvent(&noteOffEvent, &values[0]));
 
     // test note off event not matching any note on
     MidiEvent noteOnEvent = {MidiEventType::NOTE_ON, 0, 2, 1};
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
+    noteEventHandler.handleEvent(&noteOnEvent, &values[0]);
     noteOffEvent = {MidiEventType::NOTE_OFF, 0, 1, 1};
-    TEST_ASSERT_FALSE(noteEventHandler.handleEvent(&noteOffEvent, &dacValues));
+    TEST_ASSERT_FALSE(noteEventHandler.handleEvent(&noteOffEvent, &values[0]));
 
     // test note off event discarding matched note on
     noteOnEvent = {MidiEventType::NOTE_ON, 0, 2, 1};
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
+    noteEventHandler.handleEvent(&noteOnEvent, &values[0]);
     noteOffEvent = {MidiEventType::NOTE_OFF, 0, 2, 1};
-    noteEventHandler.handleEvent(&noteOffEvent, &dacValues);
-    TEST_ASSERT_FALSE(noteEventHandler.handleEvent(&noteOffEvent, &dacValues));
+    noteEventHandler.handleEvent(&noteOffEvent, &values[0]);
+    TEST_ASSERT_FALSE(noteEventHandler.handleEvent(&noteOffEvent, &values[0]));
 
     // test note off event matching only latest note on
     noteOnEvent = {MidiEventType::NOTE_ON, 0, 2, 1};
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
+    noteEventHandler.handleEvent(&noteOnEvent, &values[0]);
     noteOnEvent = {MidiEventType::NOTE_ON, 0, 3, 1};
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
+    noteEventHandler.handleEvent(&noteOnEvent, &values[0]);
     noteOffEvent = {MidiEventType::NOTE_OFF, 0, 2, 1};
-    TEST_ASSERT_FALSE(noteEventHandler.handleEvent(&noteOffEvent, &dacValues));
+    TEST_ASSERT_FALSE(noteEventHandler.handleEvent(&noteOffEvent, &values[0]));
 }
 
 void test_NoteEventHandler_midiNoteOnOrOff_nullDacEventPointer_DontHandle()
 {
-    MockValueRemapper valueRemapper;
-    NoteEventHandler noteEventHandler = NoteEventHandler(0, 1, &valueRemapper);
+    NoteEventHandler noteEventHandler;
     const MidiEvent noteOnEvent = {MidiEventType::NOTE_ON, 0, 2, 1};
     const MidiEvent noteOffEvent = {MidiEventType::NOTE_OFF, 0, 2, 1};
 
@@ -99,195 +85,133 @@ void test_NoteEventHandler_midiNoteOnOrOff_nullDacEventPointer_DontHandle()
 
 void test_NoteEventHandler_nullMidiEventPointer_DontHandle()
 {
-    MockValueRemapper valueRemapper;
-    NoteEventHandler noteEventHandler = NoteEventHandler(0, 1, &valueRemapper);
-    DacValues dacValues;
-
-    TEST_ASSERT_FALSE(noteEventHandler.handleEvent(nullptr, &dacValues));
+    NoteEventHandler noteEventHandler;
+    uint16_t values[2] = {0, 0};
+    TEST_ASSERT_FALSE(noteEventHandler.handleEvent(nullptr, &values[0]));
 }
 
 void test_NoteEventHandler_midiNoteOnEventNotMatchingChannelAndNumber_DontHandle()
 {
-    MockValueRemapper valueRemapper;
-    NoteEventHandler noteEventHandler = NoteEventHandler(0, 1, &valueRemapper);
-    DacValues dacValues;
+    NoteEventHandler noteEventHandler;
+    uint16_t values[2] = {0, 0};
     const MidiEvent noteOnEvent = {MidiEventType::NOTE_ON, 2, 2, 1};
+    TEST_ASSERT_FALSE(noteEventHandler.handleEvent(&noteOnEvent, &values[0]));
     const MidiEvent noteOffEvent = {MidiEventType::NOTE_OFF, 2, 2, 1};
-
-    TEST_ASSERT_FALSE(noteEventHandler.handleEvent(&noteOnEvent, &dacValues));
-    TEST_ASSERT_FALSE(noteEventHandler.handleEvent(&noteOffEvent, &dacValues));
+    TEST_ASSERT_FALSE(noteEventHandler.handleEvent(&noteOffEvent, &values[0]));
 }
 
 void test_NoteEventHandler_midiNoteOnEvent_MatchingChannelAndNumberAndValue_ValidDacEvent()
 {
-    MockValueRemapper valueRemapper;
-    NoteEventHandler noteEventHandler = NoteEventHandler(0, 1, &valueRemapper);
-    DacValues dacValues;
+    NoteEventHandler noteEventHandler;
+    uint16_t values[2] = {0, 0};
 
     // test match first midi channel
     MidiEvent noteOnEvent = {MidiEventType::NOTE_ON, 0, 2, 1};
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(2), dacValues.values[0]); // note
-    TEST_ASSERT_EQUAL(valueRemapper.remapVelocity(1), dacValues.values[1]); // velocity
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(0), dacValues.values[2]); // note
-    TEST_ASSERT_EQUAL(valueRemapper.remapVelocity(0), dacValues.values[3]); // velocity
-
-    // test match second midi channel
-    noteOnEvent = {MidiEventType::NOTE_ON, 1, 2, 1};
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(2), dacValues.values[0]); // note
-    TEST_ASSERT_EQUAL(valueRemapper.remapVelocity(1), dacValues.values[1]); // velocity
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(2), dacValues.values[2]); // note
-    TEST_ASSERT_EQUAL(valueRemapper.remapVelocity(1), dacValues.values[3]); // velocity
+    noteEventHandler.handleEvent(&noteOnEvent, &values[0]);
+    TEST_ASSERT_EQUAL(ValueRemapper::remapNote(2), values[0]); // note
+    TEST_ASSERT_EQUAL(ValueRemapper::remapMidiValue(1), values[1]); // velocity
 }
 
 void test_NoteEventHandler_midiNoteOffEvent_MatchingChannelAndNumberAndValue_ValidDacEvent()
 {
-    MockValueRemapper valueRemapper;
-    NoteEventHandler noteEventHandler = NoteEventHandler(0, 1, &valueRemapper);
-    DacValues dacValues;
+    NoteEventHandler noteEventHandler;
+    uint16_t values[2] = {0, 0};
 
-    // test match first midi channel
     MidiEvent noteOnEvent = {MidiEventType::NOTE_ON, 0, 2, 1};
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
+    noteEventHandler.handleEvent(&noteOnEvent, &values[0]);
     MidiEvent noteOffEvent = {MidiEventType::NOTE_OFF, 0, 2, 1};
-    noteEventHandler.handleEvent(&noteOffEvent, &dacValues);
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(0), dacValues.values[0]); // note
-    TEST_ASSERT_EQUAL(valueRemapper.remapVelocity(1), dacValues.values[1]); // velocity
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(0), dacValues.values[2]); // note
-    TEST_ASSERT_EQUAL(valueRemapper.remapVelocity(0), dacValues.values[3]); // velocity
-
-    // test match second midi channel
-    noteOnEvent = {MidiEventType::NOTE_ON, 1, 2, 1};
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
-    noteOffEvent = {MidiEventType::NOTE_OFF, 1, 2, 1};
-    noteEventHandler.handleEvent(&noteOffEvent, &dacValues);
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(0), dacValues.values[0]); // note
-    TEST_ASSERT_EQUAL(valueRemapper.remapVelocity(1), dacValues.values[1]); // velocity
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(0), dacValues.values[2]); // note
-    TEST_ASSERT_EQUAL(valueRemapper.remapVelocity(1), dacValues.values[3]); // velocity
+    noteEventHandler.handleEvent(&noteOffEvent, &values[0]);
+    TEST_ASSERT_EQUAL(ValueRemapper::remapNote(0), values[0]); // note
+    TEST_ASSERT_EQUAL(ValueRemapper::remapMidiValue(1), values[1]); // velocity
 }
 
 void test_NoteEventHandler_midiNoteOffEvent_legatoInOrder_ValidDacEvent()
 {
-    MockValueRemapper valueRemapper;
-    NoteEventHandler noteEventHandler = NoteEventHandler(0, 1, &valueRemapper);
-    DacValues dacValues;
+    NoteEventHandler noteEventHandler;
+    uint16_t values[2] = {0, 0};
 
     MidiEvent noteOnEvent = {MidiEventType::NOTE_ON, 0, 2, 1};
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
+    noteEventHandler.handleEvent(&noteOnEvent, &values[0]);
     noteOnEvent = {MidiEventType::NOTE_ON, 0, 3, 1};
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
+    noteEventHandler.handleEvent(&noteOnEvent, &values[0]);
     MidiEvent noteOffEvent = {MidiEventType::NOTE_OFF, 0, 3, 1};
-    noteEventHandler.handleEvent(&noteOffEvent, &dacValues);
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(2), dacValues.values[0]); // note
+    noteEventHandler.handleEvent(&noteOffEvent, &values[0]);
+    TEST_ASSERT_EQUAL(ValueRemapper::remapNote(2), values[0]); // note
     noteOffEvent = {MidiEventType::NOTE_OFF, 0, 2, 1};
-    noteEventHandler.handleEvent(&noteOffEvent, &dacValues);
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(0), dacValues.values[2]); // note
+    noteEventHandler.handleEvent(&noteOffEvent, &values[0]);
+    TEST_ASSERT_EQUAL(ValueRemapper::remapNote(0), values[0]); // note
 }
 
 
 void test_NoteEventHandler_midiNoteOffEvent_legatoOutOfOrder_ValidDacEvent()
 {
-    MockValueRemapper valueRemapper;
-    NoteEventHandler noteEventHandler = NoteEventHandler(0, 1, &valueRemapper);
-    DacValues dacValues;
+    NoteEventHandler noteEventHandler;
+    uint16_t values[2] = {0, 0};
 
     MidiEvent noteOnEvent = {MidiEventType::NOTE_ON, 0, 2, 1};
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
+    noteEventHandler.handleEvent(&noteOnEvent, &values[0]);
     noteOnEvent = {MidiEventType::NOTE_ON, 0, 3, 1};
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
+    noteEventHandler.handleEvent(&noteOnEvent, &values[0]);
     MidiEvent noteOffEvent = {MidiEventType::NOTE_OFF, 0, 2, 1};
-    noteEventHandler.handleEvent(&noteOffEvent, &dacValues);
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(3), dacValues.values[0]); // note
+    noteEventHandler.handleEvent(&noteOffEvent, &values[0]);
+    TEST_ASSERT_EQUAL(ValueRemapper::remapNote(3), values[0]); // note
     noteOffEvent = {MidiEventType::NOTE_OFF, 0, 3, 1};
-    noteEventHandler.handleEvent(&noteOffEvent, &dacValues);
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(0), dacValues.values[2]); // note
+    noteEventHandler.handleEvent(&noteOffEvent, &values[0]);
+    TEST_ASSERT_EQUAL(ValueRemapper::remapNote(0), values[0]); // note
 }
 
 void test_NoteEventHandler_midiNoteOffEvent_successiveNotes_ValidDacEvent()
 {
-    MockValueRemapper valueRemapper;
-    NoteEventHandler noteEventHandler = NoteEventHandler(0, 1, &valueRemapper);
-    DacValues dacValues;
+    NoteEventHandler noteEventHandler;
+    uint16_t values[2] = {0, 0};
 
     // Same notes
     MidiEvent noteOnEvent = {MidiEventType::NOTE_ON, 0, 2, 1};
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
+    noteEventHandler.handleEvent(&noteOnEvent, &values[0]);
     MidiEvent noteOffEvent = {MidiEventType::NOTE_OFF, 0, 2, 1};
-    noteEventHandler.handleEvent(&noteOffEvent, &dacValues);
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
-    noteEventHandler.handleEvent(&noteOffEvent, &dacValues);
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(0), dacValues.values[0]); // note
+    noteEventHandler.handleEvent(&noteOffEvent, &values[0]);
+    noteEventHandler.handleEvent(&noteOnEvent, &values[0]);
+    noteEventHandler.handleEvent(&noteOffEvent, &values[0]);
+    TEST_ASSERT_EQUAL(ValueRemapper::remapNote(0), values[0]); // note
 
     // Different notes
     noteOnEvent = {MidiEventType::NOTE_ON, 0, 3, 1};
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
+    noteEventHandler.handleEvent(&noteOnEvent, &values[0]);
     noteOffEvent = {MidiEventType::NOTE_OFF, 0, 3, 1};
-    noteEventHandler.handleEvent(&noteOffEvent, &dacValues);
+    noteEventHandler.handleEvent(&noteOffEvent, &values[0]);
     noteOnEvent = {MidiEventType::NOTE_ON, 0, 4, 1};
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
+    noteEventHandler.handleEvent(&noteOnEvent, &values[0]);
     noteOffEvent = {MidiEventType::NOTE_OFF, 0, 4, 1};
-    noteEventHandler.handleEvent(&noteOffEvent, &dacValues);
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(0), dacValues.values[0]); // note
+    noteEventHandler.handleEvent(&noteOffEvent, &values[0]);
+    TEST_ASSERT_EQUAL(ValueRemapper::remapNote(0), values[0]); // note
 }
 
-class MockDoubleValueRemapper: public IValueRemapper
-{
-public:
-    inline uint16_t remapCC(uint8_t value) const override { return value * 2; }
-    inline uint16_t remapNote(uint8_t value) const override { return value * 2; }
-    inline uint16_t remapVelocity(uint8_t value) const override { return value * 2; }
-};
+uint16_t mockDoubleValueRemapper(uint8_t value) { return value * 2; }
 
 void test_NoteEventHandler_midiNoteOnEvent_DoubleValueMapper_ValidDacEvent()
 {
-    MockDoubleValueRemapper valueRemapper;
-    NoteEventHandler noteEventHandler = NoteEventHandler(0, 1, &valueRemapper);
-    DacValues dacValues;
+    NoteEventHandler noteEventHandler(0, &mockDoubleValueRemapper, &mockDoubleValueRemapper);
+    uint16_t values[2] = {0, 0};
 
     // test match first midi channel
     MidiEvent noteOnEvent = {MidiEventType::NOTE_ON, 0, 2, 1};
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(2), dacValues.values[0]); // note
-    TEST_ASSERT_EQUAL(valueRemapper.remapVelocity(1), dacValues.values[1]); // velocity
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(0), dacValues.values[2]); // note
-    TEST_ASSERT_EQUAL(valueRemapper.remapVelocity(0), dacValues.values[3]); // velocity
-
-    // test match second midi channel
-    noteOnEvent = {MidiEventType::NOTE_ON, 1, 2, 1};
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(2), dacValues.values[0]); // note
-    TEST_ASSERT_EQUAL(valueRemapper.remapVelocity(1), dacValues.values[1]); // velocity
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(2), dacValues.values[2]); // note
-    TEST_ASSERT_EQUAL(valueRemapper.remapVelocity(1), dacValues.values[3]); // velocity
+    noteEventHandler.handleEvent(&noteOnEvent, &values[0]);
+    TEST_ASSERT_EQUAL(mockDoubleValueRemapper(2), values[0]); // note
+    TEST_ASSERT_EQUAL(mockDoubleValueRemapper(1), values[1]); // velocity
 }
 
 void test_NoteEventHandler_midiNoteOffEvent_DoubleValueMapper_ValidDacEvent()
 {
-    MockDoubleValueRemapper valueRemapper;
-    NoteEventHandler noteEventHandler = NoteEventHandler(0, 1, &valueRemapper);
-    DacValues dacValues;
+    NoteEventHandler noteEventHandler(0, &mockDoubleValueRemapper, &mockDoubleValueRemapper);
+    uint16_t values[2] = {0, 0};
 
     // test match first midi channel
     MidiEvent noteOnEvent = {MidiEventType::NOTE_ON, 0, 2, 1};
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
+    noteEventHandler.handleEvent(&noteOnEvent, &values[0]);
     MidiEvent noteOffEvent = {MidiEventType::NOTE_OFF, 0, 2, 1};
-    noteEventHandler.handleEvent(&noteOffEvent, &dacValues);
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(0), dacValues.values[0]); // note
-    TEST_ASSERT_EQUAL(valueRemapper.remapVelocity(1), dacValues.values[1]); // velocity
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(0), dacValues.values[2]); // note
-    TEST_ASSERT_EQUAL(valueRemapper.remapVelocity(0), dacValues.values[3]); // velocity
-
-    // test match second midi channel
-    noteOnEvent = {MidiEventType::NOTE_ON, 1, 2, 1};
-    noteEventHandler.handleEvent(&noteOnEvent, &dacValues);
-    noteOffEvent = {MidiEventType::NOTE_OFF, 1, 2, 1};
-    noteEventHandler.handleEvent(&noteOffEvent, &dacValues);
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(0), dacValues.values[0]); // note
-    TEST_ASSERT_EQUAL(valueRemapper.remapVelocity(1), dacValues.values[1]); // velocity
-    TEST_ASSERT_EQUAL(valueRemapper.remapNote(0), dacValues.values[2]); // note
-    TEST_ASSERT_EQUAL(valueRemapper.remapVelocity(1), dacValues.values[3]); // velocity
+    noteEventHandler.handleEvent(&noteOffEvent, &values[0]);
+    TEST_ASSERT_EQUAL(mockDoubleValueRemapper(0), values[0]); // note
+    TEST_ASSERT_EQUAL(mockDoubleValueRemapper(1), values[1]); // velocity
 }
 int main()
 {

@@ -1,5 +1,6 @@
 #include <unity.h>
-#include "DacEventHandlerFactory.h"
+#include "DacEventHandlerContainer.h"
+#include "Utils/DacPitchCalibrationLookUpTable.h"
 #include "MidiEvent.h"
 
 const uint8_t midiMinValue = 0;
@@ -22,36 +23,28 @@ void setUp() {}
 void tearDown() {}
 
 void test_DacEventHandlerFactory_createNoteEventHandler() {
-    DacPresetConfig dacConfig;
-    DacEventHandlerFactory<midiMinValue, midiMaxValue, lowerMidiNote, range> factory;
-    DacEventHandler *noteEventHandler = factory.createEventHandler(&dacPresetConfig, true);
-    TEST_ASSERT_NOT_NULL(noteEventHandler);
+    DacEventHandlerContainer container;
+    container.configureHandlers(&dacPresetConfig, true);
 
     const MidiEvent noteOnEvent = {MidiEventType::NOTE_ON, 0, 1, 2};
     DacValues dacValues;
-    TEST_ASSERT_TRUE(noteEventHandler->handleEvent(&noteOnEvent, &dacValues));
-    uint8_t expectedValue = factory.valueRemapper.remapNote(1);
+    TEST_ASSERT_TRUE(container.handleEvent(&noteOnEvent, &dacValues));
+    uint8_t expectedValue = ValueRemapper::remapNote(1);
     TEST_ASSERT_EQUAL(expectedValue, dacValues.values[0]);
-    expectedValue = factory.valueRemapper.remapVelocity(2);
+    expectedValue = ValueRemapper::remapMidiValue(2);
     TEST_ASSERT_EQUAL(expectedValue, dacValues.values[1]);
 }
 
 void test_DacEventHandlerFactory_createCCEventHandler() {
-    DacPresetConfig dacConfig;
-    dacConfig.CCChannels1 = 0x00;
-    dacConfig.CCNumber1 = 1;
-    DacEventHandlerFactory<midiMinValue, midiMaxValue, lowerMidiNote, range> factory;
-    DacEventHandler *ccEventHandler = factory.createEventHandler(&dacConfig, false);
-    TEST_ASSERT_NOT_NULL(ccEventHandler);
+    DacEventHandlerContainer container;
+    container.configureHandlers(&dacPresetConfig, false);
 
-    const MidiEvent ccEvent = {MidiEventType::CC, 0, 1, 1};
+    const MidiEvent ccEvent = {MidiEventType::CC, 0, 0, 1};
     DacValues dacValues;
-    TEST_ASSERT_TRUE(ccEventHandler->handleEvent(&ccEvent, &dacValues));
-    const uint8_t expectedValue = factory.valueRemapper.remapCC(1);
+    TEST_ASSERT_TRUE(container.handleEvent(&ccEvent, &dacValues));
+    const uint8_t expectedValue = ValueRemapper::remapMidiValue(1);
     TEST_ASSERT_EQUAL(expectedValue, dacValues.values[0]);
 }
-
-// TODO test various mapping functions
 
 int main() {
     UNITY_BEGIN();

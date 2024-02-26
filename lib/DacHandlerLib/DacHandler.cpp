@@ -1,27 +1,14 @@
 #include "DacHandler.h"
 
-DacHandler::~DacHandler()
+void DacHandler::handleEvent(const MidiEvent *event)
 {
-    delete _handler;
-}
-
-void DacHandler::setHandler(DacEventHandler *handler)
-{
-    delete _handler;
-    _handler = handler;
-}
-
-bool DacHandler::handleEvent(const MidiEvent *event)
-{
-    if (_handler == nullptr || event == nullptr)
+    if (event == nullptr)
     {
-        return false;
+        return;
     }
 
-    if (_handler->handleEvent(event, &_dacValues))
+    if (_handlerContainer.handleEvent(event, &_dacValues))
     {
         _writeValuesToDac(&_dacValues);
-        return true;
     }
-    return false;
 }

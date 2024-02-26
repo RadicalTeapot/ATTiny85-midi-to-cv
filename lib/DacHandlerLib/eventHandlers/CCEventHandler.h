@@ -1,28 +1,23 @@
 #ifndef CCEventHandler_h
 #define CCEventHandler_h
 
-#include "DacEventHandler.h"
 #include "MidiEvent.h"
 #include "DacValues.h"
 #include "../Utils/ValueRemapper.h"
 
-#define CC_CONFIG_NUMBER 4
 
-typedef struct _CC_EVENT_CONFIG {
-    uint8_t channel;
-    uint8_t number;
-} CCConfig;
-
-class CCEventHandler : public DacEventHandler
+class CCEventHandler
 {
     public:
-        CCEventHandler(uint8_t channel1, uint8_t number1, uint8_t channel2, uint8_t number2, uint8_t channel3, uint8_t number3, uint8_t channel4, uint8_t number4, const IValueRemapper *valueRemapper);
-        bool handleEvent(const MidiEvent *event, DacValues *dacValues);
+        CCEventHandler(uint8_t channel = 0, uint8_t number = 0, const ValueRemapper::RemapMidiValue ccValueRemapper = ValueRemapper::remapMidiValue)
+            : _channel(channel), _number(number), _ccValueRemapper(ccValueRemapper) {}
+        void configure(uint8_t channel, uint8_t number) { _channel = channel; _number = number; }
+
+        bool handleEvent(const MidiEvent *event, uint16_t *values) const;
     private:
-        bool _handleEvent(uint8_t index, const MidiCCEvent *event);
-        CCConfig _cc[CC_CONFIG_NUMBER];
-        uint8_t _values[4];
-        const IValueRemapper *_valueRemapper;
+        uint8_t _channel;
+        uint8_t _number;
+        ValueRemapper::RemapMidiValue _ccValueRemapper;
 };
 
 #endif // CCEventHandler_h

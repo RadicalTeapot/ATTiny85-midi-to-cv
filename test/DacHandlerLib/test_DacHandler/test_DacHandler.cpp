@@ -1,8 +1,8 @@
 #include <unity.h>
 #include "DacHandler.h"
-#include "DacEventHandlerFactory.h"
 #include "MidiEvent.h"
 #include "Preset.h"
+#include "Utils/ValueRemapper.h"
 
 const uint8_t midiMinValue = 0;
 const uint8_t midiMaxValue = 127;
@@ -36,43 +36,25 @@ void mock_writeValuesToDac(DacValues *dacValues) {
     values[3] = dacValues->values[3];
 }
 
-void test_DacHandler_handleEvent_nullHandlerPointer_DontHandle() {
-    DacHandler dacHandler;
-    const MidiEvent event = {MidiEventType::NOTE_ON, 0, 1, 1};
-    TEST_ASSERT_FALSE(dacHandler.handleEvent(&event));
-}
-
-void test_DacHandler_handleEvent_nullMidiEventPointer_DontHandle() {
-    DacHandler dacHandler;
-    DacEventHandlerFactory<midiMinValue, midiMaxValue, lowerMidiNote, range> factory;
-    DacEventHandler *eventHandler = factory.createEventHandler(&dacPresetConfig, true);
-    dacHandler.setHandler(eventHandler);
-    TEST_ASSERT_FALSE(dacHandler.handleEvent(nullptr));
-}
-
 void test_DacHandler_MidiNoteOnEvent_handleEvent() {
     DacHandler dacHandler(mock_writeValuesToDac);
-    DacEventHandlerFactory<midiMinValue, midiMaxValue, lowerMidiNote, range> factory;
-    DacEventHandler *eventHandler = factory.createEventHandler(&dacPresetConfig, true);
-    dacHandler.setHandler(eventHandler);
+    dacHandler.configure(&dacPresetConfig, true);
 
     const MidiEvent event = {MidiEventType::NOTE_ON, 0, 1, 1};
-    TEST_ASSERT_TRUE(dacHandler.handleEvent(&event));
+    dacHandler.handleEvent(&event);
 
-    uint16_t expectedValue = factory.valueRemapper.remapNote(1);
+    uint16_t expectedValue = ValueRemapper::remapNote(1);
     TEST_ASSERT_EQUAL(expectedValue, values[0]);
-    expectedValue = factory.valueRemapper.remapVelocity(1);
+    expectedValue = ValueRemapper::remapMidiValue(1);
     TEST_ASSERT_EQUAL(expectedValue, values[1]);
-    expectedValue = factory.valueRemapper.remapNote(0);
+    expectedValue = ValueRemapper::remapNote(0);
     TEST_ASSERT_EQUAL(expectedValue, values[2]);
-    expectedValue = factory.valueRemapper.remapVelocity(0);
+    expectedValue = ValueRemapper::remapMidiValue(0);
     TEST_ASSERT_EQUAL(expectedValue, values[3]);
 }
 
 int main() {
     UNITY_BEGIN();
-    RUN_TEST(test_DacHandler_handleEvent_nullHandlerPointer_DontHandle);
-    RUN_TEST(test_DacHandler_handleEvent_nullMidiEventPointer_DontHandle);
     RUN_TEST(test_DacHandler_MidiNoteOnEvent_handleEvent);
     UNITY_END();
 }

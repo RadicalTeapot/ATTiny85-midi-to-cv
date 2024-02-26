@@ -3,7 +3,7 @@
 
 #include "MidiEvent.h"
 #include "DacValues.h"
-#include "eventHandlers/DacEventHandler.h"
+#include "DacEventHandlerContainer.h"
 
 class DacHandler
 {
@@ -11,11 +11,10 @@ public:
     typedef void (*WriteValuesToDac)(DacValues *dacValues);
 
     DacHandler(WriteValuesToDac writeValuesToDac = defaultWriteValuesToDac) : _writeValuesToDac(writeValuesToDac) {};
-    ~DacHandler();
-    void setHandler(DacEventHandler *handler);
-    bool handleEvent(const MidiEvent *event);
+    void configure(const DacPresetConfig *dacConfig, bool isNoteHandler) { _handlerContainer.configureHandlers(dacConfig, isNoteHandler); }
+    void handleEvent(const MidiEvent *event);
 private:
-    DacEventHandler *_handler = NULL;
+    DacEventHandlerContainer _handlerContainer;
     DacValues _dacValues;
 
     WriteValuesToDac _writeValuesToDac;

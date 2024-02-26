@@ -1,68 +1,31 @@
 #include "NoteEventHandler.h"
 
-NoteEventHandler::NoteEventHandler(uint8_t channel1, uint8_t channel2, const IValueRemapper *valueRemapper): _valueRemapper(valueRemapper)
+bool NoteEventHandler::handleEvent(const MidiEvent *event, uint16_t *values)
 {
-    _channels[0] = channel1;
-    _channels[1] = channel2;
-
-    _values[0] = 0;
-    _values[1] = 0;
-    _values[2] = 0;
-    _values[3] = 0;
-}
-
-bool NoteEventHandler::handleEvent(const MidiEvent *event, DacValues *dacValues)
-{
-    if (dacValues == nullptr || event == nullptr)
+    if (values == nullptr || event == nullptr)
     {
         return 0;
     }
 
-    if (event->type == MidiEventType::NOTE_ON)
-    {
-        uint8_t i = NOTE_EVENTS_NUMBER;
-        do
-        {
-            i--;
-            if (_handleNoteOnEvent(i, (MidiNoteOnEvent *)event))
-            {
-                setDacValues(_values, dacValues);
-                return true;
-            }
-        } while (i);
-    }
-    else if (event->type == MidiEventType::NOTE_OFF)
-    {
-        uint8_t i = NOTE_EVENTS_NUMBER;
-        do
-        {
-            i--;
-            if (_handleNoteOffEvent(i, (MidiNoteOffEvent *)event))
-            {
-                setDacValues(_values, dacValues);
-                return true;
-            }
-        } while (i);
-    }
-    return false;
+    return (event->type == MidiEventType::NOTE_ON && _handleNoteOnEvent((MidiNoteOnEvent *)event, values))
+        || (event->type == MidiEventType::NOTE_OFF && _handleNoteOffEvent((MidiNoteOffEvent *)event, values));
 }
 
-bool NoteEventHandler::_handleNoteOnEvent(uint8_t index, const MidiNoteOnEvent *event)
+bool NoteEventHandler::_handleNoteOnEvent(const MidiNoteOnEvent *event, uint16_t *values)
 {
-    if (_channels[index] == event->channel)
+    if (_channel == event->channel)
     {
-        _values[index * 2] = event->note;
-        _values[index * 2 + 1] = event->velocity;
-
         _notes.append(event->note);
+        values[0] = _noteRemapper(event->note);
+        values[1] = _velocityRemapper(event->velocity);
         return true;
     }
     return false;
 }
 
-bool NoteEventHandler::_handleNoteOffEvent(uint8_t index, const MidiNoteOffEvent *event)
+bool NoteEventHandler::_handleNoteOffEvent(const MidiNoteOffEvent *event, uint16_t *values)
 {
-    if (_channels[index] == event->channel)
+    if (_channel == event->channel)
     {
         uint8_t tail = _notes.getTail();
         _notes.remove(tail);
@@ -70,18 +33,10 @@ bool NoteEventHandler::_handleNoteOffEvent(uint8_t index, const MidiNoteOffEvent
         // If the removed note is the same as the event note, send a new note (most recent active note)
         if (tail == event->note)
         {
-            _values[index * 2] = _notes.getTail();
-            _values[index * 2 + 1] = event->velocity;
+            values[0] = _noteRemapper(_notes.getTail());
+            values[1] = _velocityRemapper(event->velocity);
             return true;
         }
     }
     return false;
-}
-
-inline void NoteEventHandler::setDacValues(const uint8_t values[4], DacValues *dacValues) const
-{
-    dacValues->values[0] = _valueRemapper->remapNote(values[0]);
-    dacValues->values[1] = _valueRemapper->remapVelocity(values[1]);
-    dacValues->values[2] = _valueRemapper->remapNote(values[2]);
-    dacValues->values[3] = _valueRemapper->remapVelocity(values[3]);
 }

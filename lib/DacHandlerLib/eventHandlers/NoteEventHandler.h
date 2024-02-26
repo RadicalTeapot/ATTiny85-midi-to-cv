@@ -1,28 +1,29 @@
 #ifndef NoteEventHandler_h
 #define NoteEventHandler_h
 
-#include "EventHandlers/DacEventHandler.h"
 #include <MidiEvent.h>
 #include "../DacValues.h"
 #include <CyclicCompactArray.h>
 #include "../Utils/ValueRemapper.h"
 
-#define NOTE_EVENTS_NUMBER 2
-#define MAX_LEGATO_NOTE_NUMBER 4
+const uint8_t MAX_LEGATO_NOTE_NUMBER = 4;
 
-class NoteEventHandler : public DacEventHandler {
-    public:
-        NoteEventHandler(uint8_t channel1, uint8_t channel2, const IValueRemapper *valueRemapper);
-        bool handleEvent(const MidiEvent *event, DacValues *dacValues);
-    private:
-        uint8_t _channels[NOTE_EVENTS_NUMBER];
-        CyclicCompactArray<MAX_LEGATO_NOTE_NUMBER> _notes;
-        uint8_t _values[4];
-        const IValueRemapper *_valueRemapper;
+class NoteEventHandler
+{
+public:
+    NoteEventHandler(uint8_t channel = 0, const ValueRemapper::RemapMidiValue noteRemapper = ValueRemapper::remapNote, const ValueRemapper::RemapMidiValue velocityRemapper = ValueRemapper::remapMidiValue)
+        : _channel(channel), _noteRemapper(noteRemapper), _velocityRemapper(velocityRemapper) {}
+    void configure(uint8_t channel) { _channel = channel; }
 
-        bool _handleNoteOnEvent(uint8_t index, const MidiNoteOnEvent *event);
-        bool _handleNoteOffEvent(uint8_t index, const MidiNoteOffEvent *event);
-        inline void setDacValues(const uint8_t values[4], DacValues *dacValues) const;
+    bool handleEvent(const MidiEvent *event, uint16_t *values);
+private:
+    uint8_t _channel;
+    CyclicCompactArray<MAX_LEGATO_NOTE_NUMBER> _notes;
+    ValueRemapper::RemapMidiValue _noteRemapper;
+    ValueRemapper::RemapMidiValue _velocityRemapper;
+
+    bool inline _handleNoteOnEvent(const MidiNoteOnEvent *event, uint16_t *values);
+    bool _handleNoteOffEvent(const MidiNoteOffEvent *event, uint16_t *values);
 };
 
 #endif // NoteEventHandler_h

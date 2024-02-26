@@ -3,7 +3,6 @@
 #include <Adafruit_MCP4728.h>
 
 #include "DefaultPresets.h"
-#include "DacEventHandlerFactory.h"
 #include "DacHandler.h"
 #include "MidiParser.h"
 #include "MidiSerialCommunication.h"
@@ -29,7 +28,6 @@ MidiEvent midiEvent;
 
 Adafruit_MCP4728 DACs[DAC_COUNT];
 DacHandler dacHandlers[DAC_COUNT];
-DacEventHandlerFactory<0, 127, DacPitchCalibration::LOW_MIDI_NOTE, DacPitchCalibration::RANGE> dacEventHandlerFactory;
 
 ShiftRegisterHandler shiftRegisterHandler;
 
@@ -53,12 +51,12 @@ void setup()
     const uint8_t firstDacIndex = 0;
     DacHandler::WriteValuesToDac writeValuesToFirstDac = &writeValuesToDac<firstDacIndex>;
     dacHandlers[0] = DacHandler(writeValuesToFirstDac);
-    dacHandlers[0].setHandler(dacEventHandlerFactory.createEventHandler(&preset0.dacConfigA, switchesState & 1));
+    dacHandlers[0].configure(&preset0.dacConfigA, switchesState & 1);
 
     const uint8_t secondDacIndex = 1;
     DacHandler::WriteValuesToDac writeValuesToSecondDac = &writeValuesToDac<secondDacIndex>;
     dacHandlers[1] = DacHandler(writeValuesToSecondDac);
-    dacHandlers[1].setHandler(dacEventHandlerFactory.createEventHandler(&preset0.dacConfigB, switchesState & 2));
+    dacHandlers[1].configure(&preset0.dacConfigB, switchesState & 2);
 
     shiftRegisterHandler.updateHandlersFromFirstDacConfig(&preset0.dacConfigA, switchesState & 1);
     shiftRegisterHandler.updateHandlersFromSecondDacConfig(&preset0.dacConfigB, switchesState & 2);
@@ -80,8 +78,8 @@ void loop()
     SwitchHandler::getSwitchesState<SWITCH_A_PIN, SWITCH_B_PIN>(&switchesState);
     if (switchesState != previousSwitchesState)
     {
-        dacHandlers[0].setHandler(dacEventHandlerFactory.createEventHandler(&preset0.dacConfigA, switchesState & 1));
-        dacHandlers[1].setHandler(dacEventHandlerFactory.createEventHandler(&preset0.dacConfigB, switchesState & 2));
+        dacHandlers[0].configure(&preset0.dacConfigA, switchesState & 1);
+        dacHandlers[1].configure(&preset0.dacConfigB, switchesState & 2);
         shiftRegisterHandler.updateHandlersFromFirstDacConfig(&preset0.dacConfigA, switchesState & 1);
         shiftRegisterHandler.updateHandlersFromSecondDacConfig(&preset0.dacConfigB, switchesState & 2);
         previousSwitchesState = switchesState;
