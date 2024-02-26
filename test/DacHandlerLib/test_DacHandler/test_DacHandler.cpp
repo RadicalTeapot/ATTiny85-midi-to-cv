@@ -4,6 +4,11 @@
 #include "MidiEvent.h"
 #include "Preset.h"
 
+const uint8_t midiMinValue = 0;
+const uint8_t midiMaxValue = 127;
+const uint8_t lowerMidiNote = 0;
+const uint8_t range = DacPitchCalibration::RANGE;
+
 uint8_t values[4];
 void setUp() {
     values[0] = 0;
@@ -39,23 +44,29 @@ void test_DacHandler_handleEvent_nullHandlerPointer_DontHandle() {
 
 void test_DacHandler_handleEvent_nullMidiEventPointer_DontHandle() {
     DacHandler dacHandler;
-    DacPresetConfig dacConfig;
-    DacEventHandler *eventHandler = DacEventHandlerFactory::Factory::createEventHandler(&dacConfig, true);
+    DacEventHandlerFactory<midiMinValue, midiMaxValue, lowerMidiNote, range> factory;
+    DacEventHandler *eventHandler = factory.createEventHandler(&dacPresetConfig, true);
     dacHandler.setHandler(eventHandler);
     TEST_ASSERT_FALSE(dacHandler.handleEvent(nullptr));
 }
 
 void test_DacHandler_MidiNoteOnEvent_handleEvent() {
     DacHandler dacHandler(mock_writeValuesToDac);
-    DacEventHandler *eventHandler = DacEventHandlerFactory::Factory::createEventHandler(&dacPresetConfig, true);
+    DacEventHandlerFactory<midiMinValue, midiMaxValue, lowerMidiNote, range> factory;
+    DacEventHandler *eventHandler = factory.createEventHandler(&dacPresetConfig, true);
     dacHandler.setHandler(eventHandler);
 
     const MidiEvent event = {MidiEventType::NOTE_ON, 0, 1, 1};
     TEST_ASSERT_TRUE(dacHandler.handleEvent(&event));
-    TEST_ASSERT_EQUAL(1, values[0]);
-    TEST_ASSERT_EQUAL(1, values[1]);
-    TEST_ASSERT_EQUAL(0, values[2]);
-    TEST_ASSERT_EQUAL(0, values[3]);
+
+    uint16_t expectedValue = factory.valueRemapper.remapNote(1);
+    TEST_ASSERT_EQUAL(expectedValue, values[0]);
+    expectedValue = factory.valueRemapper.remapVelocity(1);
+    TEST_ASSERT_EQUAL(expectedValue, values[1]);
+    expectedValue = factory.valueRemapper.remapNote(0);
+    TEST_ASSERT_EQUAL(expectedValue, values[2]);
+    expectedValue = factory.valueRemapper.remapVelocity(0);
+    TEST_ASSERT_EQUAL(expectedValue, values[3]);
 }
 
 int main() {

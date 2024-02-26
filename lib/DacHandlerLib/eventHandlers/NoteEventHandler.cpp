@@ -1,6 +1,6 @@
 #include "NoteEventHandler.h"
 
-NoteEventHandler::NoteEventHandler(DacValueMapper valueMapper, uint8_t channel1, uint8_t channel2): DacEventHandler(valueMapper)
+NoteEventHandler::NoteEventHandler(uint8_t channel1, uint8_t channel2, const IValueRemapper *valueRemapper): _valueRemapper(valueRemapper)
 {
     _channels[0] = channel1;
     _channels[1] = channel2;
@@ -26,7 +26,7 @@ bool NoteEventHandler::handleEvent(const MidiEvent *event, DacValues *dacValues)
             i--;
             if (_handleNoteOnEvent(i, (MidiNoteOnEvent *)event))
             {
-                _valueMapper(_values, dacValues);
+                setDacValues(_values, dacValues);
                 return true;
             }
         } while (i);
@@ -39,7 +39,7 @@ bool NoteEventHandler::handleEvent(const MidiEvent *event, DacValues *dacValues)
             i--;
             if (_handleNoteOffEvent(i, (MidiNoteOffEvent *)event))
             {
-                _valueMapper(_values, dacValues);
+                setDacValues(_values, dacValues);
                 return true;
             }
         } while (i);
@@ -76,4 +76,12 @@ bool NoteEventHandler::_handleNoteOffEvent(uint8_t index, const MidiNoteOffEvent
         }
     }
     return false;
+}
+
+inline void NoteEventHandler::setDacValues(const uint8_t values[4], DacValues *dacValues) const
+{
+    dacValues->values[0] = _valueRemapper->remapNote(values[0]);
+    dacValues->values[1] = _valueRemapper->remapVelocity(values[1]);
+    dacValues->values[2] = _valueRemapper->remapNote(values[2]);
+    dacValues->values[3] = _valueRemapper->remapVelocity(values[3]);
 }

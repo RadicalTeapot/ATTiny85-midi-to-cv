@@ -4,6 +4,7 @@
 #include "DacEventHandler.h"
 #include "MidiEvent.h"
 #include "DacValues.h"
+#include "../Utils/ValueRemapper.h"
 
 #define CC_CONFIG_NUMBER 4
 
@@ -15,12 +16,13 @@ typedef struct _CC_EVENT_CONFIG {
 class CCEventHandler : public DacEventHandler
 {
     public:
-        CCEventHandler(DacValueMapper valueMapper, uint8_t channel1, uint8_t number1, uint8_t channel2, uint8_t number2, uint8_t channel3, uint8_t number3, uint8_t channel4, uint8_t number4);
+        CCEventHandler(uint8_t channel1, uint8_t number1, uint8_t channel2, uint8_t number2, uint8_t channel3, uint8_t number3, uint8_t channel4, uint8_t number4, const IValueRemapper *valueRemapper);
         bool handleEvent(const MidiEvent *event, DacValues *dacValues);
     private:
         bool _handleEvent(uint8_t index, const MidiCCEvent *event);
         CCConfig _cc[CC_CONFIG_NUMBER];
         uint8_t _values[4];
+        const IValueRemapper *_valueRemapper;
 };
 
 #endif // CCEventHandler_h

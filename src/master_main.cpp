@@ -18,7 +18,6 @@
 #define MIDI_IN_PIN (1U)
 #define SWITCH_A_PIN (3U)
 #define SWITCH_B_PIN (4U)
-#define LOW_MIDI_NOTE (36U)
 #define DAC_A_ADDRESS (0x60U)
 #define DAC_B_ADDRESS (0x61U)
 
@@ -30,6 +29,7 @@ MidiEvent midiEvent;
 
 Adafruit_MCP4728 DACs[DAC_COUNT];
 DacHandler dacHandlers[DAC_COUNT];
+DacEventHandlerFactory<0, 127, DacPitchCalibration::LOW_MIDI_NOTE, DacPitchCalibration::RANGE> dacEventHandlerFactory;
 
 ShiftRegisterHandler shiftRegisterHandler;
 
@@ -49,19 +49,16 @@ void setup()
     SwitchHandler::getSwitchesState<SWITCH_A_PIN, SWITCH_B_PIN>(&switchesState);
     previousSwitchesState = switchesState;
 
-    DacEventHandlerFactory::Factory::noteValueMapper = &DacEventHandlerFactory::dacNoteValueMapper<LOW_MIDI_NOTE, RANGE, MIDI_MAX_VALUE>;
-    DacEventHandlerFactory::Factory::ccValueMapper = &DacEventHandlerFactory::dacCCValueMapper<MIDI_MAX_VALUE>;
-
     // Set dac handler write function
     const uint8_t firstDacIndex = 0;
     DacHandler::WriteValuesToDac writeValuesToFirstDac = &writeValuesToDac<firstDacIndex>;
     dacHandlers[0] = DacHandler(writeValuesToFirstDac);
-    dacHandlers[0].setHandler(DacEventHandlerFactory::Factory::createEventHandler(&preset0.dacConfigA, switchesState & 1));
+    dacHandlers[0].setHandler(dacEventHandlerFactory.createEventHandler(&preset0.dacConfigA, switchesState & 1));
 
     const uint8_t secondDacIndex = 1;
     DacHandler::WriteValuesToDac writeValuesToSecondDac = &writeValuesToDac<secondDacIndex>;
     dacHandlers[1] = DacHandler(writeValuesToSecondDac);
-    dacHandlers[1].setHandler(DacEventHandlerFactory::Factory::createEventHandler(&preset0.dacConfigB, switchesState & 2));
+    dacHandlers[1].setHandler(dacEventHandlerFactory.createEventHandler(&preset0.dacConfigB, switchesState & 2));
 
     shiftRegisterHandler.updateHandlersFromFirstDacConfig(&preset0.dacConfigA, switchesState & 1);
     shiftRegisterHandler.updateHandlersFromSecondDacConfig(&preset0.dacConfigB, switchesState & 2);
@@ -83,8 +80,8 @@ void loop()
     SwitchHandler::getSwitchesState<SWITCH_A_PIN, SWITCH_B_PIN>(&switchesState);
     if (switchesState != previousSwitchesState)
     {
-        dacHandlers[0].setHandler(DacEventHandlerFactory::Factory::createEventHandler(&preset0.dacConfigA, switchesState & 1));
-        dacHandlers[1].setHandler(DacEventHandlerFactory::Factory::createEventHandler(&preset0.dacConfigB, switchesState & 2));
+        dacHandlers[0].setHandler(dacEventHandlerFactory.createEventHandler(&preset0.dacConfigA, switchesState & 1));
+        dacHandlers[1].setHandler(dacEventHandlerFactory.createEventHandler(&preset0.dacConfigB, switchesState & 2));
         shiftRegisterHandler.updateHandlersFromFirstDacConfig(&preset0.dacConfigA, switchesState & 1);
         shiftRegisterHandler.updateHandlersFromSecondDacConfig(&preset0.dacConfigB, switchesState & 2);
         previousSwitchesState = switchesState;

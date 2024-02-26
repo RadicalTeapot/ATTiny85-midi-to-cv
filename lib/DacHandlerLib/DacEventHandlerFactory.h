@@ -2,64 +2,32 @@
 #define DacEventHandlerFactory_h
 
 #include "Preset.h"
-#include "DacPitchCalibrationLookUpTable.h"
-#include "eventHandlers/DacEventHandler.h"
+#include "Utils/ValueRemapper.h"
+#include "EventHandlers/NoteEventHandler.h"
+#include "EventHandlers/CCEventHandler.h"
 
-#ifndef ARDUINO
-#include <algorithm>
-#endif
-
-namespace DacEventHandlerFactory
+template <uint8_t midiMinValue, uint8_t midiMaxValue, uint8_t lowerMidiNote, uint8_t range>
+class
+DacEventHandlerFactory
 {
-    class Factory
-    {
-    public:
-        static DacValueMapper noteValueMapper;
-        static DacValueMapper ccValueMapper;
-        static DacEventHandler *createEventHandler(const DacPresetConfig *dacConfig, bool isNoteHandler);
-    };
+public:
+    const ValueRemapper valueRemapper = ValueRemapper(midiMinValue, midiMaxValue, lowerMidiNote, range);
 
-    static inline void defaultDacValueMapper(const uint8_t values[4], DacValues *dacValues)
+    DacEventHandler *createEventHandler(const DacPresetConfig *dacConfig, bool isNoteHandler)
     {
-        dacValues->values[0] = values[0];
-        dacValues->values[1] = values[1];
-        dacValues->values[2] = values[2];
-        dacValues->values[3] = values[3];
+        if (isNoteHandler)
+        {
+            return new NoteEventHandler(dacConfig->NoteChannels >> 4, dacConfig->NoteChannels & 0x0F, &valueRemapper);
+        }
+        else
+        {
+            return new CCEventHandler(
+                dacConfig->CCChannels1 >> 4, dacConfig->CCNumber1,
+                dacConfig->CCChannels1 & 0x0F, dacConfig->CCNumber2,
+                dacConfig->CCChannels2 >> 4, dacConfig->CCNumber3,
+                dacConfig->CCChannels2 & 0x0F, dacConfig->CCNumber4, &valueRemapper);
+        }
     }
-
-    template <uint8_t lowerMidiNote, uint8_t range>
-    static inline uint16_t remapMidiNote(uint8_t midiNote)
-    {
-#ifdef ARDUINO
-        return pgm_read_word_near(DacPitchCalibrationLookUpTable + min(midiNote - lowerMidiNote, range - 1));
-#else
-        return DacPitchCalibrationLookUpTable[std::min(midiNote - lowerMidiNote, range - 1)];
-#endif
-    }
-
-    template <uint8_t lowerBound, uint8_t upperBound>
-    static inline uint16_t remapMidiValue(uint8_t midiNote)
-    {
-        return static_cast<uint32_t>(midiNote - lowerBound) * 4095U / (upperBound - lowerBound);
-    }
-
-    template <uint8_t lowerMidiNote, uint8_t range, uint8_t midiMaxValue>
-    void dacNoteValueMapper(const uint8_t values[4], DacValues *dacValues)
-    {
-        dacValues->values[0] = remapMidiNote<lowerMidiNote, range>(dacValues->values[0]);
-        dacValues->values[1] = remapMidiValue<0, midiMaxValue>(dacValues->values[1]);
-        dacValues->values[2] = remapMidiNote<lowerMidiNote, range>(dacValues->values[2]);
-        dacValues->values[3] = remapMidiValue<0, midiMaxValue>(dacValues->values[3]);
-    }
-
-    template <uint8_t midiMaxValue>
-    void dacCCValueMapper(const uint8_t values[4], DacValues *dacValues)
-    {
-        dacValues->values[0] = remapMidiValue<0, midiMaxValue>(dacValues->values[0]);
-        dacValues->values[1] = remapMidiValue<0, midiMaxValue>(dacValues->values[1]);
-        dacValues->values[2] = remapMidiValue<0, midiMaxValue>(dacValues->values[2]);
-        dacValues->values[3] = remapMidiValue<0, midiMaxValue>(dacValues->values[3]);
-    }
-}
+};
 
 #endif // DacEventHandlerFactory_h

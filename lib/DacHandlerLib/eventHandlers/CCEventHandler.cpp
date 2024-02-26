@@ -1,11 +1,11 @@
 #include "CCEventHandler.h"
 
 CCEventHandler::CCEventHandler(
-    DacValueMapper valueMapper,
     uint8_t channel1, uint8_t number1,
     uint8_t channel2, uint8_t number2,
     uint8_t channel3, uint8_t number3,
-    uint8_t channel4, uint8_t number4): DacEventHandler(valueMapper)
+    uint8_t channel4, uint8_t number4,
+    const IValueRemapper *valueRemapper): _valueRemapper(valueRemapper)
 {
     _cc[0].channel = channel1;
     _cc[0].number = number1;
@@ -35,7 +35,10 @@ bool CCEventHandler::handleEvent(const MidiEvent *event, DacValues *dacValues)
         i--;
         if (_handleEvent(i, (MidiCCEvent *)event))
         {
-            _valueMapper(_values, dacValues);
+            dacValues->values[0] = _valueRemapper->remapCC(_values[0]);
+            dacValues->values[1] = _valueRemapper->remapCC(_values[1]);
+            dacValues->values[2] = _valueRemapper->remapCC(_values[2]);
+            dacValues->values[3] = _valueRemapper->remapCC(_values[3]);
             return true;
         }
     } while (i);
