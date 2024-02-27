@@ -13,11 +13,11 @@ namespace MidiSerialCommunication
         serial->begin(baudRate);
     }
 
-    bool recv(MidiEventLib::Event *MidiEventLib::Event, ReceiveOnlySoftwareSerial *serial, Parser *parser)
+    bool recv(MidiEventLib::Event *midiEvent, ReceiveOnlySoftwareSerial *serial, MidiEventLib::Parser *parser)
     {
         if (serial->available())
         {
-            return parser->parse(serial->read(), MidiEventLib::Event);
+            return parser->parse(serial->read(), midiEvent);
         }
         return false;
     }
