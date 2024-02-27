@@ -6,13 +6,10 @@ bool MidiEventLib::Parser::parse(uint8_t midiByte, MidiEventLib::Event *midiEven
     {
         parseMidiCommand(midiByte);
     }
-    else
+    else if (parseMidiData(midiByte, midiEvent))
     {
-        if (parseMidiData(midiByte, midiEvent))
-        {
-            resetMidiData();
-            return true;
-        }
+        resetMidiData();
+        return true;
     }
     return false;
 }

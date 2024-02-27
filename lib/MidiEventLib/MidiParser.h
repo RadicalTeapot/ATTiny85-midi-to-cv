@@ -17,28 +17,28 @@ namespace MidiEventLib
         void parseMidiCommand(uint8_t midiByte);
         bool parseMidiData(uint8_t midiByte, Event *midiEvent);
 
-        inline uint8_t getMidiChannel()
+        inline uint8_t getMidiChannel() const
         {
             return _lastMidiCommand & CHANNEL_COMMAND_MASK;
         }
 
-        inline bool isMidiCommand(uint8_t midiByte)
+        inline bool isMidiCommand(uint8_t midiByte) const
         {
             return midiByte >> 7 == 1;
         }
-        inline bool isMidiSystemCommand(uint8_t midiByte)
+        inline bool isMidiSystemCommand(uint8_t midiByte) const
         {
             return (midiByte & COMMAND_MASK) == CHANNEL_SYSTEM_COMMAND;
         }
-        inline bool isMidiNoteOn()
+        inline bool isMidiNoteOn() const
         {
             return (_lastMidiCommand & COMMAND_MASK) == NOTE_ON;
         }
-        inline bool isMidiNoteOff()
+        inline bool isMidiNoteOff() const
         {
             return (_lastMidiCommand & COMMAND_MASK) == NOTE_OFF;
         }
-        inline bool isMidiCC()
+        inline bool isMidiCC() const
         {
             return (_lastMidiCommand & COMMAND_MASK) == CONTROL_CHANGE_COMMAND;
         }
