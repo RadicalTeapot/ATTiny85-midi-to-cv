@@ -6,14 +6,14 @@ void setUp() {}
 
 void tearDown() {}
 
-void test_ShiftRegisterEventHandlerContainer_defaultState()
+void test_ShiftRegisterEventHandlerContainer_DefaultState()
 {
     ShiftRegisterEventHandlerContainer container;
-    MidiEvent midiEvent = {MidiEventType::NOTE_ON, DEFAULT_CHANNEL, 0, 0};
+    MidiEvent midiEvent = {MidiEventType::NOTE_ON, ShiftRegisterEventHandlerContainerConstants::DEFAULT_CHANNEL, 0, 0};
     uint8_t expectedResult = 0, result = 0;
     for (int i = 0; i < 8; i++)
     {
-        midiEvent.firstByte = DEFAULT_NOTES[i];
+        midiEvent.firstByte = ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[i];
         result = container.processEvent(&midiEvent, result);
         expectedResult |= 1 << i;
         TEST_ASSERT_EQUAL(expectedResult, result);
@@ -21,7 +21,7 @@ void test_ShiftRegisterEventHandlerContainer_defaultState()
     midiEvent.type = MidiEventType::NOTE_OFF;
     for (int i = 0; i < 8; i++)
     {
-        midiEvent.firstByte = DEFAULT_NOTES[i];
+        midiEvent.firstByte = ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[i];
         result = container.processEvent(&midiEvent, result);
         expectedResult &= ~(1 << i);
         TEST_ASSERT_EQUAL(expectedResult, result);
@@ -33,11 +33,11 @@ void test_ShiftRegisterEventHandlerContainer_InvalidMidiEvents_ReturnsState()
     ShiftRegisterEventHandlerContainer container;
 
     // test invalid channel
-    MidiEvent event = {MidiEventType::NOTE_ON, 1, DEFAULT_NOTES[0], 1};
+    MidiEvent event = {MidiEventType::NOTE_ON, 1, ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[0], 1};
     TEST_ASSERT_EQUAL(0, container.processEvent(&event, 0));
 
     // test invalid note
-    event = {MidiEventType::NOTE_ON, DEFAULT_CHANNEL, 0, 1};
+    event = {MidiEventType::NOTE_ON, ShiftRegisterEventHandlerContainerConstants::DEFAULT_CHANNEL, 0, 1};
     TEST_ASSERT_EQUAL(0, container.processEvent(&event, 0));
 
     // test invalid event type
@@ -45,7 +45,7 @@ void test_ShiftRegisterEventHandlerContainer_InvalidMidiEvents_ReturnsState()
     TEST_ASSERT_EQUAL(0, container.processEvent(&event, 0));
 }
 
-void test_ShiftRegisterEventHandlerContainer_setFirstHandlersPairFromDacConfig()
+void test_ShiftRegisterEventHandlerContainer_ChannelMode_SetFirstHandlersPairFromDacConfig_ValidData()
 {
     ShiftRegisterEventHandlerContainer container;
     container.setFirstHandlersPairFromDacConfig(&preset0.dacConfigA, true);
@@ -61,7 +61,18 @@ void test_ShiftRegisterEventHandlerContainer_setFirstHandlersPairFromDacConfig()
     TEST_ASSERT_EQUAL(0B00000000, container.processEvent(&midiEvent, 0));
 }
 
-void test_ShiftRegisterEventHandlerContainer_setSecondHandlersPairFromDacConfig()
+
+void test_ShiftRegisterEventHandlerContainer_CCMode_SetFirstHandlersPairFromDacConfig_ValidData()
+    {
+        ShiftRegisterEventHandlerContainer container;
+        container.setFirstHandlersPairFromDacConfig(&preset0.dacConfigA, false);
+
+        MidiEvent midiEvent = {MidiEventType::CC, (uint8_t)(preset0.dacConfigA.CCChannels1 >> 4U), preset0.dacConfigA.CCNumber1, 1};
+        TEST_ASSERT_EQUAL(0B00000001, container.processEvent(&midiEvent, 0));
+
+    }
+
+void test_ShiftRegisterEventHandlerContainer_ChannelMode_SetSecondHandlersPairFromDacConfig_ValidData()
 {
     ShiftRegisterEventHandlerContainer container;
     container.setSecondHandlersPairFromDacConfig(&preset0.dacConfigB, true);
@@ -77,7 +88,8 @@ void test_ShiftRegisterEventHandlerContainer_setSecondHandlersPairFromDacConfig(
     TEST_ASSERT_EQUAL(0B00000000, container.processEvent(&midiEvent, 0));
 }
 
-void test_ShiftRegisterEventHandlerContainer_setHandlersFromDacConfig_InvalidMidiEvent_ReturnsState()
+void test_ShiftRegisterEventHandlerContainer_SetHandlersFromDacConfig_InvalidMidiEvent_ReturnsState()
+
 {
     ShiftRegisterEventHandlerContainer container;
     container.setFirstHandlersPairFromDacConfig(&preset0.dacConfigA, true);
@@ -95,10 +107,10 @@ void test_ShiftRegisterEventHandlerContainer_setHandlersFromDacConfig_InvalidMid
 int main()
 {
     UNITY_BEGIN();
-    RUN_TEST(test_ShiftRegisterEventHandlerContainer_defaultState);
+    RUN_TEST(test_ShiftRegisterEventHandlerContainer_DefaultState);
     RUN_TEST(test_ShiftRegisterEventHandlerContainer_InvalidMidiEvents_ReturnsState);
-    RUN_TEST(test_ShiftRegisterEventHandlerContainer_setFirstHandlersPairFromDacConfig);
-    RUN_TEST(test_ShiftRegisterEventHandlerContainer_setSecondHandlersPairFromDacConfig);
-    RUN_TEST(test_ShiftRegisterEventHandlerContainer_setHandlersFromDacConfig_InvalidMidiEvent_ReturnsState);
+    RUN_TEST(test_ShiftRegisterEventHandlerContainer_ChannelMode_SetFirstHandlersPairFromDacConfig_ValidData);
+    RUN_TEST(test_ShiftRegisterEventHandlerContainer_ChannelMode_SetSecondHandlersPairFromDacConfig_ValidData);
+    RUN_TEST(test_ShiftRegisterEventHandlerContainer_SetHandlersFromDacConfig_InvalidMidiEvent_ReturnsState);
     return UNITY_END();
 }

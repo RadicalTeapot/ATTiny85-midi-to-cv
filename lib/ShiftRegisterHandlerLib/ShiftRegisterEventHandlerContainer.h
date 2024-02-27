@@ -5,9 +5,12 @@
 #include "MidiEvent.h"
 #include "Preset.h"
 
-const uint8_t HANDLER_COUNT = 8;
-const uint8_t DEFAULT_CHANNEL = 0;
-const uint8_t DEFAULT_NOTES[HANDLER_COUNT] = {24, 25, 26, 27, 28, 29, 30, 31};
+namespace ShiftRegisterEventHandlerContainerConstants
+{
+    const uint8_t HANDLER_COUNT = 8;
+    const uint8_t DEFAULT_CHANNEL = 0;
+    const uint8_t DEFAULT_NOTES[HANDLER_COUNT] = {24, 25, 26, 27, 28, 29, 30, 31};
+}
 
 class ShiftRegisterEventHandlerContainer
 {
@@ -27,7 +30,7 @@ public:
     uint8_t processEvent(const MidiEvent *event, const uint8_t previousState) const;
 
 private:
-    ShiftRegisterEventHandler _handlers[HANDLER_COUNT];
+    ShiftRegisterEventHandler _handlers[ShiftRegisterEventHandlerContainerConstants::HANDLER_COUNT];
     void setHandlersFromDacConfig(const DacPresetConfig *dacConfig, bool isNoteHandler, uint8_t index);
 };
 

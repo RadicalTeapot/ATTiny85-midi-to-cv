@@ -3,11 +3,11 @@
 ShiftRegisterEventHandlerContainer::ShiftRegisterEventHandlerContainer()
 {
     // TODO This should probably be in an init function rather than the constructor
-    uint8_t i = HANDLER_COUNT;
+    uint8_t i = ShiftRegisterEventHandlerContainerConstants::HANDLER_COUNT;
     do
     {
         i--;
-        _handlers[i] = ShiftRegisterEventHandler(shouldProcessNoteEvent<DEFAULT_CHANNEL>, DEFAULT_NOTES[i]);
+        _handlers[i] = ShiftRegisterEventHandler(shouldProcessNoteEvent<ShiftRegisterEventHandlerContainerConstants::DEFAULT_CHANNEL>, ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[i]);
     } while (i);
 }
 
@@ -20,8 +20,8 @@ void ShiftRegisterEventHandlerContainer::setHandlersFromDacConfig(const DacPrese
     }
     else
     {
-        _handlers[index].setShouldProcessEvent(shouldProcessNoteEvent<DEFAULT_CHANNEL>, DEFAULT_NOTES[index]);
-        _handlers[index + 1].setShouldProcessEvent(shouldProcessNoteEvent<DEFAULT_CHANNEL>, DEFAULT_NOTES[index + 1]);
+        _handlers[index].setShouldProcessEvent(shouldProcessNoteEvent<ShiftRegisterEventHandlerContainerConstants::DEFAULT_CHANNEL>, ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[index]);
+        _handlers[index + 1].setShouldProcessEvent(shouldProcessNoteEvent<ShiftRegisterEventHandlerContainerConstants::DEFAULT_CHANNEL>, ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[index + 1]);
     }
 }
 
