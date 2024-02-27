@@ -18,7 +18,7 @@ void DacEventHandlerContainer::configureHandlers(const DacPresetConfig *dacConfi
     }
 }
 
-bool DacEventHandlerContainer::handleEvent(const MidiEvent *event, DacValues *dacValues)
+bool DacEventHandlerContainer::handleEvent(const MidiEventLib::Event *event, DacValues *dacValues)
 {
     if (_useNoteHandlers)
     {

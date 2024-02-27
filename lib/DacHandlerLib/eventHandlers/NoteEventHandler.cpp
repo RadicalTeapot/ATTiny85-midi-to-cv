@@ -1,17 +1,17 @@
 #include "NoteEventHandler.h"
 
-bool NoteEventHandler::handleEvent(const MidiEvent *event, uint16_t *values)
+bool NoteEventHandler::handleEvent(const MidiEventLib::Event *event, uint16_t *values)
 {
     if (values == nullptr || event == nullptr)
     {
         return 0;
     }
 
-    return (event->type == MidiEventType::NOTE_ON && _handleNoteOnEvent((MidiNoteOnEvent *)event, values))
-        || (event->type == MidiEventType::NOTE_OFF && _handleNoteOffEvent((MidiNoteOffEvent *)event, values));
+    return (event->type == MidiEventLib::EventType::NOTE_ON && _handleNoteOnEvent((MidiEventLib::NoteOnEvent *)event, values))
+        || (event->type == MidiEventLib::EventType::NOTE_OFF && _handleNoteOffEvent((MidiEventLib::NoteOffEvent *)event, values));
 }
 
-bool NoteEventHandler::_handleNoteOnEvent(const MidiNoteOnEvent *event, uint16_t *values)
+bool NoteEventHandler::_handleNoteOnEvent(const MidiEventLib::NoteOnEvent *event, uint16_t *values)
 {
     if (_channel == event->channel)
     {
@@ -23,7 +23,7 @@ bool NoteEventHandler::_handleNoteOnEvent(const MidiNoteOnEvent *event, uint16_t
     return false;
 }
 
-bool NoteEventHandler::_handleNoteOffEvent(const MidiNoteOffEvent *event, uint16_t *values)
+bool NoteEventHandler::_handleNoteOffEvent(const MidiEventLib::NoteOffEvent *event, uint16_t *values)
 {
     if (_channel == event->channel)
     {

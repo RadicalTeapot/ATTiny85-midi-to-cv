@@ -13,7 +13,7 @@ public:
 
     void updateHandlersFromFirstDacConfig(const DacPresetConfig *dacConfig, bool isNoteHandler);
     void updateHandlersFromSecondDacConfig(const DacPresetConfig *dacConfig, bool isNoteHandler);
-    void processEvent(const MidiEvent *event);
+    void processEvent(const MidiEventLib::Event *event);
 
 private:
     uint8_t _state = 0;

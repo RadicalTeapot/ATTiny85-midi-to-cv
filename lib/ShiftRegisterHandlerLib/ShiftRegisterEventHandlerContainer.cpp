@@ -25,7 +25,7 @@ void ShiftRegisterEventHandlerContainer::setHandlersFromDacConfig(const DacPrese
     }
 }
 
-uint8_t ShiftRegisterEventHandlerContainer::processEvent(const MidiEvent *event, const uint8_t previousState) const
+uint8_t ShiftRegisterEventHandlerContainer::processEvent(const MidiEventLib::Event *event, const uint8_t previousState) const
 {
     uint8_t maskedPreviousState = 0;
     uint8_t i = 8, mask = 0, result = 0;

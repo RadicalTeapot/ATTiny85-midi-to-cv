@@ -23,8 +23,8 @@
 #define DAC_COUNT (2U)
 
 ReceiveOnlySoftwareSerial serial(MIDI_IN_PIN);
-MidiParser midiParser;
-MidiEvent midiEvent;
+Parser midiParser;
+MidiEventLib::Event MidiEventLib::Event;
 
 Adafruit_MCP4728 DACs[DAC_COUNT];
 DacHandler dacHandlers[DAC_COUNT];
@@ -85,11 +85,11 @@ void loop()
         previousSwitchesState = switchesState;
     }
 
-    if (MidiSerialCommunication::recv(&midiEvent, &serial, &midiParser))
+    if (MidiSerialCommunication::recv(&MidiEventLib::Event, &serial, &midiParser))
     {
-        dacHandlers[0].handleEvent(&midiEvent);
-        dacHandlers[1].handleEvent(&midiEvent);
-        shiftRegisterHandler.processEvent(&midiEvent);
+        dacHandlers[0].handleEvent(&MidiEventLib::Event);
+        dacHandlers[1].handleEvent(&MidiEventLib::Event);
+        shiftRegisterHandler.processEvent(&MidiEventLib::Event);
     }
 }
 

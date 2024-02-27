@@ -9,7 +9,7 @@ class DacEventHandlerContainer
 {
 public:
     void configureHandlers(const DacPresetConfig *dacConfig, bool isNoteHandler);
-    bool handleEvent(const MidiEvent *event, DacValues *dacValues);
+    bool handleEvent(const MidiEventLib::Event *event, DacValues *dacValues);
 
 private:
     NoteEventHandler _noteEventHandlers[2];

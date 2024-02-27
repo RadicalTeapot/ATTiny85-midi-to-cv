@@ -40,7 +40,7 @@ void test_DacHandler_MidiNoteOnEvent_handleEvent() {
     DacHandler dacHandler(mock_writeValuesToDac);
     dacHandler.configure(&dacPresetConfig, true);
 
-    const MidiEvent event = {MidiEventType::NOTE_ON, 0, 1, 1};
+    const MidiEventLib::Event event = {MidiEventLib::EventType::NOTE_ON, 0, 1, 1};
     dacHandler.handleEvent(&event);
 
     uint16_t expectedValue = ValueRemapper::remapNote(1);

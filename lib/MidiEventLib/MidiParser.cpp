@@ -1,6 +1,6 @@
 #include <MidiParser.h>
 
-bool MidiParser::parse(uint8_t midiByte, MidiEvent *midiEvent)
+bool MidiEventLib::Parser::parse(uint8_t midiByte, MidiEventLib::Event *midiEvent)
 {
     if (isMidiCommand(midiByte))
     {
@@ -17,7 +17,7 @@ bool MidiParser::parse(uint8_t midiByte, MidiEvent *midiEvent)
     return false;
 }
 
-void MidiParser::parseMidiCommand(uint8_t midiByte)
+void MidiEventLib::Parser::parseMidiCommand(uint8_t midiByte)
 {
     if (isMidiSystemCommand(midiByte))
     {
@@ -30,7 +30,7 @@ void MidiParser::parseMidiCommand(uint8_t midiByte)
     }
 }
 
-bool MidiParser::parseMidiData(uint8_t midiByte, MidiEvent *midiEvent)
+bool MidiEventLib::Parser::parseMidiData(uint8_t midiByte, MidiEventLib::Event *midiEvent)
 {
     if (_midiData[0] == 0)
     {
@@ -41,17 +41,17 @@ bool MidiParser::parseMidiData(uint8_t midiByte, MidiEvent *midiEvent)
         _midiData[1] = midiByte;
         if (isMidiNoteOn() && _midiData[1] != 0)
         {
-            MidiEvent::setNoteOnEventData(midiEvent, getMidiChannel(), _midiData[0], _midiData[1]);
+            MidiEventLib::Event::setNoteOnEventData(midiEvent, getMidiChannel(), _midiData[0], _midiData[1]);
             return true;
         }
         else if (isMidiNoteOff() || (isMidiNoteOn() && _midiData[1] == 0))
         {
-            MidiEvent::setNoteOffEventData(midiEvent, getMidiChannel(), _midiData[0], _midiData[1]);
+            MidiEventLib::Event::setNoteOffEventData(midiEvent, getMidiChannel(), _midiData[0], _midiData[1]);
             return true;
         }
         else if (isMidiCC())
         {
-            MidiEvent::setCCEventData(midiEvent, getMidiChannel(), _midiData[0], _midiData[1]);
+            MidiEventLib::Event::setCCEventData(midiEvent, getMidiChannel(), _midiData[0], _midiData[1]);
             return true;
         }
     }

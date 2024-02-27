@@ -27,7 +27,7 @@ void test_DacEventHandlerFactory_createNoteEventHandler() {
     container.configureHandlers(&dacPresetConfig, true);
 
     // First channel
-    MidiEvent noteOnEvent = {MidiEventType::NOTE_ON, (uint8_t)(dacPresetConfig.NoteChannels >> 4), 1, 2};
+    MidiEventLib::Event noteOnEvent = {MidiEventLib::EventType::NOTE_ON, (uint8_t)(dacPresetConfig.NoteChannels >> 4), 1, 2};
     DacValues dacValues;
     TEST_ASSERT_TRUE(container.handleEvent(&noteOnEvent, &dacValues));
     uint8_t expectedValue = ValueRemapper::remapNote(1);
@@ -36,7 +36,7 @@ void test_DacEventHandlerFactory_createNoteEventHandler() {
     TEST_ASSERT_EQUAL(expectedValue, dacValues.values[1]);
 
     // Second channel
-    noteOnEvent = {MidiEventType::NOTE_ON, (uint8_t)(dacPresetConfig.NoteChannels & 0x0F), 1, 2};
+    noteOnEvent = {MidiEventLib::EventType::NOTE_ON, (uint8_t)(dacPresetConfig.NoteChannels & 0x0F), 1, 2};
     TEST_ASSERT_TRUE(container.handleEvent(&noteOnEvent, &dacValues));
     expectedValue = ValueRemapper::remapNote(1);
     TEST_ASSERT_EQUAL(expectedValue, dacValues.values[2]);
@@ -49,26 +49,26 @@ void test_DacEventHandlerFactory_createCCEventHandler() {
     container.configureHandlers(&dacPresetConfig, false);
 
     // Fist channel and CC number
-    MidiEvent ccEvent = {MidiEventType::CC, (uint8_t)(dacPresetConfig.CCChannels1 >> 4), dacPresetConfig.CCNumber1, 1};
+    MidiEventLib::Event ccEvent = {MidiEventLib::EventType::CC, (uint8_t)(dacPresetConfig.CCChannels1 >> 4), dacPresetConfig.CCNumber1, 1};
     DacValues dacValues;
     TEST_ASSERT_TRUE(container.handleEvent(&ccEvent, &dacValues));
     uint8_t expectedValue = ValueRemapper::remapMidiValue(1);
     TEST_ASSERT_EQUAL(expectedValue, dacValues.values[0]);
 
     // Second channel and CC number
-    ccEvent = {MidiEventType::CC, (uint8_t)(dacPresetConfig.CCChannels1 & 0x0F), dacPresetConfig.CCNumber2, 1};
+    ccEvent = {MidiEventLib::EventType::CC, (uint8_t)(dacPresetConfig.CCChannels1 & 0x0F), dacPresetConfig.CCNumber2, 1};
     TEST_ASSERT_TRUE(container.handleEvent(&ccEvent, &dacValues));
     expectedValue = ValueRemapper::remapMidiValue(1);
     TEST_ASSERT_EQUAL(expectedValue, dacValues.values[1]);
 
     // Third channel and CC number
-    ccEvent = {MidiEventType::CC, (uint8_t)(dacPresetConfig.CCChannels2 >> 4), dacPresetConfig.CCNumber3, 1};
+    ccEvent = {MidiEventLib::EventType::CC, (uint8_t)(dacPresetConfig.CCChannels2 >> 4), dacPresetConfig.CCNumber3, 1};
     TEST_ASSERT_TRUE(container.handleEvent(&ccEvent, &dacValues));
     expectedValue = ValueRemapper::remapMidiValue(1);
     TEST_ASSERT_EQUAL(expectedValue, dacValues.values[2]);
 
     // Fourth channel and CC number
-    ccEvent = {MidiEventType::CC, (uint8_t)(dacPresetConfig.CCChannels2 & 0x0F), dacPresetConfig.CCNumber4, 1};
+    ccEvent = {MidiEventLib::EventType::CC, (uint8_t)(dacPresetConfig.CCChannels2 & 0x0F), dacPresetConfig.CCNumber4, 1};
     TEST_ASSERT_TRUE(container.handleEvent(&ccEvent, &dacValues));
     expectedValue = ValueRemapper::remapMidiValue(1);
     TEST_ASSERT_EQUAL(expectedValue, dacValues.values[3]);

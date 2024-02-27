@@ -27,7 +27,7 @@ public:
         setHandlersFromDacConfig(dacConfig, isNoteHandler, 2);
     }
 
-    uint8_t processEvent(const MidiEvent *event, const uint8_t previousState) const;
+    uint8_t processEvent(const MidiEventLib::Event *event, const uint8_t previousState) const;
 
 private:
     ShiftRegisterEventHandler _handlers[ShiftRegisterEventHandlerContainerConstants::HANDLER_COUNT];

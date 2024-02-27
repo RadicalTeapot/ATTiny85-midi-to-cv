@@ -13,7 +13,7 @@ class CCEventHandler
             : _channel(channel), _number(number), _ccValueRemapper(ccValueRemapper) {}
         void configure(uint8_t channel, uint8_t number) { _channel = channel; _number = number; }
 
-        bool handleEvent(const MidiEvent *event, uint16_t *values) const;
+        bool handleEvent(const MidiEventLib::Event *event, uint16_t *values) const;
     private:
         uint8_t _channel;
         uint8_t _number;

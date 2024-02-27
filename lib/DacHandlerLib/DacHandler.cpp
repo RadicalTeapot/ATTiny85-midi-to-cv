@@ -1,6 +1,6 @@
 #include "DacHandler.h"
 
-void DacHandler::handleEvent(const MidiEvent *event)
+void DacHandler::handleEvent(const MidiEventLib::Event *event)
 {
     if (event == nullptr)
     {

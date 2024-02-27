@@ -9,7 +9,7 @@ void tearDown() {}
 void test_CCEventHandler_midiNoteOnEvent_dontHandle()
 {
     CCEventHandler ccEventHandler;
-    const MidiEvent noteOnEvent = {MidiEventType::NOTE_ON, 0, 1, 1};
+    const MidiEventLib::Event noteOnEvent = {MidiEventLib::EventType::NOTE_ON, 0, 1, 1};
     uint16_t value = 0;
     TEST_ASSERT_FALSE(ccEventHandler.handleEvent(&noteOnEvent, &value));
 }
@@ -17,7 +17,7 @@ void test_CCEventHandler_midiNoteOnEvent_dontHandle()
 void test_CCEventHandler_midiNoteOffEvent_dontHandle()
 {
     CCEventHandler ccEventHandler;
-    const MidiEvent noteOffEvent = {MidiEventType::NOTE_OFF, 0, 1, 1};
+    const MidiEventLib::Event noteOffEvent = {MidiEventLib::EventType::NOTE_OFF, 0, 1, 1};
     uint16_t value = 0;
     TEST_ASSERT_FALSE(ccEventHandler.handleEvent(&noteOffEvent, &value));
 }
@@ -27,7 +27,7 @@ void test_CCEventHandler_midiCCEvent_MatchingChannelAndNumber_Handle()
     CCEventHandler ccEventHandler;
 
     uint16_t value = 0;
-    MidiEvent ccEvent = {MidiEventType::CC, 0, 0, 1};
+    MidiEventLib::Event ccEvent = {MidiEventLib::EventType::CC, 0, 0, 1};
     TEST_ASSERT_TRUE(ccEventHandler.handleEvent(&ccEvent, &value));
     TEST_ASSERT_EQUAL(ValueRemapper::remapMidiValue(1), value);
 }
@@ -42,7 +42,7 @@ void test_CCEventHandler_NullMidiEventPointer_DontHandle()
 void test_CCEventHandler_midiCCEvent_nullDacEventPointer_DontHandle()
 {
     CCEventHandler ccEventHandler;
-    const MidiEvent ccEvent = {MidiEventType::CC, 0, 0, 1};
+    const MidiEventLib::Event ccEvent = {MidiEventLib::EventType::CC, 0, 0, 1};
     TEST_ASSERT_FALSE(ccEventHandler.handleEvent(&ccEvent, nullptr));
 }
 
@@ -50,9 +50,9 @@ void test_CCEventHandler_midiCCEvent_NotMatchingChannelAndNumber_DontHandle()
 {
     CCEventHandler ccEventHandler(0, 0);
     uint16_t value = 0;
-    MidiEvent ccEvent = {MidiEventType::CC, 0, 1, 1};
+    MidiEventLib::Event ccEvent = {MidiEventLib::EventType::CC, 0, 1, 1};
     TEST_ASSERT_FALSE(ccEventHandler.handleEvent(&ccEvent, &value));
-    ccEvent = {MidiEventType::CC, 1, 0, 1};
+    ccEvent = {MidiEventLib::EventType::CC, 1, 0, 1};
     TEST_ASSERT_FALSE(ccEventHandler.handleEvent(&ccEvent, &value));
 }
 
@@ -62,7 +62,7 @@ void test_CCEventHandler_midiCCEvent_DoubleValueMapper_ValidDacEvent()
 {
     CCEventHandler ccEventHandler = CCEventHandler(0, 0, &mockDoubleRemapCC);
     uint16_t value = 0;
-    const MidiEvent ccEvent = {MidiEventType::CC, 0, 0, 1};
+    const MidiEventLib::Event ccEvent = {MidiEventLib::EventType::CC, 0, 0, 1};
 
     ccEventHandler.handleEvent(&ccEvent, &value);
     TEST_ASSERT_EQUAL(mockDoubleRemapCC(1), value);
