@@ -7,7 +7,7 @@ ShiftRegisterEventHandlerContainer::ShiftRegisterEventHandlerContainer()
     do
     {
         i--;
-        _handlers[i] = ShiftRegisterEventHandler(shouldProcessNoteEvent<ShiftRegisterEventHandlerContainerConstants::DEFAULT_CHANNEL>, ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[i]);
+        _handlers[i] = ShiftRegisterEventHandler(shouldProcessNoteEvent, ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[i]);
     } while (i);
 }
 
@@ -15,13 +15,13 @@ void ShiftRegisterEventHandlerContainer::setHandlersFromDacConfig(const DacPrese
 {
     if (isNoteHandler)
     {
-        _handlers[index].setShouldProcessEvent(shouldProcessChannelEvent, dacConfig->NoteChannels >> 4);
-        _handlers[index + 1].setShouldProcessEvent(shouldProcessChannelEvent, dacConfig->NoteChannels & 0x0F);
+        _handlers[index].configure(shouldProcessChannelEvent, dacConfig->NoteChannels >> 4);
+        _handlers[index + 1].configure(shouldProcessChannelEvent, dacConfig->NoteChannels & 0x0F);
     }
     else
     {
-        _handlers[index].setShouldProcessEvent(shouldProcessNoteEvent<ShiftRegisterEventHandlerContainerConstants::DEFAULT_CHANNEL>, ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[index]);
-        _handlers[index + 1].setShouldProcessEvent(shouldProcessNoteEvent<ShiftRegisterEventHandlerContainerConstants::DEFAULT_CHANNEL>, ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[index + 1]);
+        _handlers[index].configure(shouldProcessNoteEvent, ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[index]);
+        _handlers[index + 1].configure(shouldProcessNoteEvent, ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[index + 1]);
     }
 }
 

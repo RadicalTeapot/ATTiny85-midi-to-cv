@@ -8,7 +8,6 @@
 namespace ShiftRegisterEventHandlerContainerConstants
 {
     const uint8_t HANDLER_COUNT = 8;
-    const uint8_t DEFAULT_CHANNEL = 0;
     const uint8_t DEFAULT_NOTES[HANDLER_COUNT] = {24, 25, 26, 27, 28, 29, 30, 31};
 }
 

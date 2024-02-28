@@ -3,9 +3,9 @@
 
 #include "MidiEvent.h"
 
-static bool defaultShouldProcessEvent(const MidiEventLib::Event *event, const uint8_t checkedValue)
+namespace ShiftRegisterEventHandlerConstants
 {
-    return false;
+    const uint8_t NOTE_CHANNEL = 0;
 }
 
 static bool shouldProcessChannelEvent(const MidiEventLib::Event *event, const uint8_t channel)
@@ -13,24 +13,25 @@ static bool shouldProcessChannelEvent(const MidiEventLib::Event *event, const ui
     return event->channel == channel && (event->type == MidiEventLib::EventType::NOTE_ON || event->type == MidiEventLib::EventType::NOTE_OFF);
 };
 
-template <uint8_t midiChannel>
+template <uint8_t midiChannel = ShiftRegisterEventHandlerConstants::NOTE_CHANNEL>
 static bool shouldProcessNoteEvent(const MidiEventLib::Event *event, const uint8_t note)
 {
-    return event->channel == midiChannel && (event->type == MidiEventLib::EventType::NOTE_ON || event->type == MidiEventLib::EventType::NOTE_OFF) && event->firstByte == note;
+    return shouldProcessChannelEvent(event, midiChannel) && event->firstByte == note;
 };
 
 class ShiftRegisterEventHandler {
 public:
     typedef bool (*ShouldProcessEventFunc)(const MidiEventLib::Event *event, const uint8_t checkedValue);
 
-    ShiftRegisterEventHandler() : _shouldProcessEvent(defaultShouldProcessEvent), _checkedValue(0) {}
-    ShiftRegisterEventHandler(ShouldProcessEventFunc shouldProcessEvent, uint8_t checkedValue) : _shouldProcessEvent(shouldProcessEvent), _checkedValue(checkedValue) {}
+    ShiftRegisterEventHandler(ShouldProcessEventFunc shouldProcessEvent = shouldProcessChannelEvent, uint8_t checkedValue = ShiftRegisterEventHandlerConstants::NOTE_CHANNEL)
+        : _shouldProcessEvent(shouldProcessEvent), _checkedValue(checkedValue) {}
 
-    void setShouldProcessEvent(ShouldProcessEventFunc shouldProcessEvent, uint8_t checkedValue)
+    void configure(ShouldProcessEventFunc shouldProcessEvent, uint8_t checkedValue)
     {
         _shouldProcessEvent = shouldProcessEvent;
         _checkedValue = checkedValue;
     }
+
     inline bool processEvent(const MidiEventLib::Event *event, const uint8_t result) const
     {
         if (_shouldProcessEvent(event, _checkedValue))
