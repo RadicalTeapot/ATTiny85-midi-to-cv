@@ -23,7 +23,7 @@ private:
     ValueRemapper::RemapMidiValue _velocityRemapper;
 
     bool inline _handleNoteOnEvent(const MidiEventLib::NoteOnEvent *event, uint16_t *values);
-    bool _handleNoteOffEvent(const MidiEventLib::NoteOffEvent *event, uint16_t *values);
+    bool inline _handleNoteOffEvent(const MidiEventLib::NoteOffEvent *event, uint16_t *values);
 };
 
 #endif // NoteEventHandler_h
