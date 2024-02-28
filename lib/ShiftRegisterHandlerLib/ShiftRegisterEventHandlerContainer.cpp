@@ -2,26 +2,25 @@
 
 ShiftRegisterEventHandlerContainer::ShiftRegisterEventHandlerContainer()
 {
-    // TODO This should probably be in an init function rather than the constructor
     uint8_t i = ShiftRegisterEventHandlerContainerConstants::HANDLER_COUNT;
     do
     {
         i--;
-        _handlers[i] = ShiftRegisterEventHandler(shouldProcessNoteEvent, ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[i]);
+        _handlers[i].configure(ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[i], false);
     } while (i);
 }
 
-void ShiftRegisterEventHandlerContainer::setHandlersFromDacConfig(const DacPresetConfig *dacConfig, bool isNoteHandler, uint8_t index)
+void ShiftRegisterEventHandlerContainer::setHandlersFromDacConfig(const DacPresetConfig *dacConfig, const bool isChannelHandler, const uint8_t index)
 {
-    if (isNoteHandler)
+    if (isChannelHandler)
     {
-        _handlers[index].configure(shouldProcessChannelEvent, dacConfig->NoteChannels >> 4);
-        _handlers[index + 1].configure(shouldProcessChannelEvent, dacConfig->NoteChannels & 0x0F);
+        _handlers[index].configure(dacConfig->NoteChannels >> 4, true);
+        _handlers[index + 1].configure(dacConfig->NoteChannels & 0x0F, true);
     }
     else
     {
-        _handlers[index].configure(shouldProcessNoteEvent, ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[index]);
-        _handlers[index + 1].configure(shouldProcessNoteEvent, ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[index + 1]);
+        _handlers[index].configure(ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[index], false);
+        _handlers[index + 1].configure(ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[index + 1], false);
     }
 }
 

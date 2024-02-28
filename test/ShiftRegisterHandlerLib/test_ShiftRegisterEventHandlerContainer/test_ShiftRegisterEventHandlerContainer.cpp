@@ -9,7 +9,7 @@ void tearDown() {}
 void test_ShiftRegisterEventHandlerContainer_DefaultState()
 {
     ShiftRegisterEventHandlerContainer container;
-    MidiEventLib::Event midiEvent = {MidiEventLib::EventType::NOTE_ON, ShiftRegisterEventHandlerConstants::NOTE_CHANNEL, 0, 0};
+    MidiEventLib::Event midiEvent = {MidiEventLib::EventType::NOTE_ON, ShiftRegisterEventHandlerContainerConstants::NOTE_CHANNEL, 0, 0};
     uint8_t expectedResult = 0, result = 0;
     for (int i = 0; i < 8; i++)
     {
@@ -37,7 +37,7 @@ void test_ShiftRegisterEventHandlerContainer_InvalidMidiEvents_ReturnsState()
     TEST_ASSERT_EQUAL(0, container.processEvent(&event, 0));
 
     // test invalid note
-    event = {MidiEventLib::EventType::NOTE_ON, ShiftRegisterEventHandlerConstants::NOTE_CHANNEL, 0, 1};
+    event = {MidiEventLib::EventType::NOTE_ON, ShiftRegisterEventHandlerContainerConstants::NOTE_CHANNEL, 0, 1};
     TEST_ASSERT_EQUAL(0, container.processEvent(&event, 0));
 
     // test invalid event type
