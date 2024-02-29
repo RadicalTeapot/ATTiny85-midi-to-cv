@@ -33,13 +33,14 @@ void test_ValueRemapper_midiValue_inRange_mapped()
 
 void test_ValueRemapper_midiValue_defaultValues()
 {
+    const uint8_t midiMaxValue = 127;
+    const uint16_t dacMaxValue = 4095;
     uint8_t input = 0;
     uint16_t output = ValueRemapper::remapMidiValue(input);
     TEST_ASSERT_EQUAL(0, output);
 
-    input = ValueRemapper::MIDI_MAX_VALUE;
-    output = ValueRemapper::remapMidiValue(input);
-    TEST_ASSERT_EQUAL(ValueRemapper::DAC_MAX_VALUE, output);
+    output = ValueRemapper::remapMidiValue(midiMaxValue);
+    TEST_ASSERT_EQUAL(dacMaxValue, output);
 }
 
 void test_ValueRemapper_noteValue_outOfRange_clamped()

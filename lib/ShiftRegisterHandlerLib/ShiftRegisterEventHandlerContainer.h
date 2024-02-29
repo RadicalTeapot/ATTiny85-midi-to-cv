@@ -5,7 +5,8 @@
 #include "MidiEvent.h"
 #include "Preset.h"
 
-namespace ShiftRegisterEventHandlerContainerConstants
+// Local constants
+namespace
 {
     const uint8_t HANDLER_COUNT = 8;
     const uint8_t NOTE_CHANNEL = 0;
@@ -30,7 +31,7 @@ public:
     uint8_t processEvent(const MidiEventLib::Event *event, const uint8_t previousState) const;
 
 private:
-    ShiftRegisterEventHandler<ShiftRegisterEventHandlerContainerConstants::NOTE_CHANNEL> _handlers[ShiftRegisterEventHandlerContainerConstants::HANDLER_COUNT];
+    ShiftRegisterEventHandler<NOTE_CHANNEL> _handlers[HANDLER_COUNT];
     void setHandlersFromDacConfig(const DacPresetConfig *dacConfig, const bool isChannelHandler, const uint8_t index);
 };
 

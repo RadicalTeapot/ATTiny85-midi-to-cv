@@ -2,11 +2,11 @@
 
 ShiftRegisterEventHandlerContainer::ShiftRegisterEventHandlerContainer()
 {
-    uint8_t i = ShiftRegisterEventHandlerContainerConstants::HANDLER_COUNT;
+    uint8_t i = HANDLER_COUNT;
     do
     {
         i--;
-        _handlers[i].configure(ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[i], false);
+        _handlers[i].configure(DEFAULT_NOTES[i], false);
     } while (i);
 }
 
@@ -19,8 +19,8 @@ void ShiftRegisterEventHandlerContainer::setHandlersFromDacConfig(const DacPrese
     }
     else
     {
-        _handlers[index].configure(ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[index], false);
-        _handlers[index + 1].configure(ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[index + 1], false);
+        _handlers[index].configure(DEFAULT_NOTES[index], false);
+        _handlers[index + 1].configure(DEFAULT_NOTES[index + 1], false);
     }
 }
 

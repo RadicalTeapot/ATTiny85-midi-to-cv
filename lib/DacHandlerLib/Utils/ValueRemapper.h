@@ -10,14 +10,18 @@
 
 #include "DacPitchCalibrationLookUpTable.h"
 
-namespace ValueRemapper
+// Local constants
+namespace
 {
-    using RemapMidiValue = uint16_t(*)(const uint8_t);
-
     const uint8_t MIDI_MIN_VALUE = 0;
     const uint8_t MIDI_MAX_VALUE = 127;
     const uint16_t DAC_MIN_VALUE = 0;
     const uint16_t DAC_MAX_VALUE = 4095;
+}
+
+namespace ValueRemapper
+{
+    using RemapMidiValue = uint16_t(*)(const uint8_t);
 
     template <uint8_t lowerMidiNote = DacPitchCalibration::LOW_MIDI_NOTE, uint8_t range = DacPitchCalibration::RANGE>
     inline uint16_t remapNote(const uint8_t midiNote)

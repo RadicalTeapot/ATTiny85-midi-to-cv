@@ -5,7 +5,6 @@
 #include "DacValues.h"
 #include "../Utils/ValueRemapper.h"
 
-
 class CCEventHandler
 {
     public:

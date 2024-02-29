@@ -6,7 +6,11 @@
 #include <CyclicCompactArray.h>
 #include "../Utils/ValueRemapper.h"
 
-const uint8_t MAX_LEGATO_NOTE_NUMBER = 4;
+// Local constants
+namespace
+{
+    const uint8_t MAX_LEGATO_NOTE_NUMBER = 4;
+}
 
 class NoteEventHandler
 {

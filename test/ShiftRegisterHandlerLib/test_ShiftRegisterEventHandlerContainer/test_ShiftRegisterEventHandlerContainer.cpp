@@ -8,20 +8,25 @@ void tearDown() {}
 
 void test_ShiftRegisterEventHandlerContainer_DefaultState()
 {
+    const uint8_t handlerCount = 8;
+    const uint8_t noteChannel = 0;
+    const uint8_t defaultNotes[handlerCount] = {24, 25, 26, 27, 28, 29, 30, 31};
+
     ShiftRegisterEventHandlerContainer container;
-    MidiEventLib::Event midiEvent = {MidiEventLib::EventType::NOTE_ON, ShiftRegisterEventHandlerContainerConstants::NOTE_CHANNEL, 0, 0};
+    MidiEventLib::Event midiEvent = {MidiEventLib::EventType::NOTE_ON, noteChannel, 0, 0};
     uint8_t expectedResult = 0, result = 0;
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < handlerCount; i++)
     {
-        midiEvent.firstByte = ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[i];
+        midiEvent.firstByte = defaultNotes[i];
         result = container.processEvent(&midiEvent, result);
         expectedResult |= 1 << i;
         TEST_ASSERT_EQUAL(expectedResult, result);
     }
+
     midiEvent.type = MidiEventLib::EventType::NOTE_OFF;
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < handlerCount; i++)
     {
-        midiEvent.firstByte = ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[i];
+        midiEvent.firstByte = defaultNotes[i];
         result = container.processEvent(&midiEvent, result);
         expectedResult &= ~(1 << i);
         TEST_ASSERT_EQUAL(expectedResult, result);
@@ -30,14 +35,16 @@ void test_ShiftRegisterEventHandlerContainer_DefaultState()
 
 void test_ShiftRegisterEventHandlerContainer_InvalidMidiEvents_ReturnsState()
 {
+    const uint8_t noteChannel = 0;
+    const uint8_t firstDefaultNote = 24;
     ShiftRegisterEventHandlerContainer container;
 
     // test invalid channel
-    MidiEventLib::Event event = {MidiEventLib::EventType::NOTE_ON, 1, ShiftRegisterEventHandlerContainerConstants::DEFAULT_NOTES[0], 1};
+    MidiEventLib::Event event = {MidiEventLib::EventType::NOTE_ON, 1, firstDefaultNote, 1};
     TEST_ASSERT_EQUAL(0, container.processEvent(&event, 0));
 
     // test invalid note
-    event = {MidiEventLib::EventType::NOTE_ON, ShiftRegisterEventHandlerContainerConstants::NOTE_CHANNEL, 0, 1};
+    event = {MidiEventLib::EventType::NOTE_ON, noteChannel, 0, 1};
     TEST_ASSERT_EQUAL(0, container.processEvent(&event, 0));
 
     // test invalid event type
