@@ -29,11 +29,10 @@ MidiEventLib::Event midiEvent;
 Adafruit_MCP4728 DACs[DAC_COUNT];
 DacHandler dacHandlers[DAC_COUNT];
 
-ShiftRegisterHandler shiftRegisterHandler;
-
 uint8_t switchesState = 0, previousSwitchesState = 0;
 
 static void writeValuesToShiftRegister(uint8_t values);
+ShiftRegisterHandler shiftRegisterHandler(writeValuesToShiftRegister);
 
 template<uint8_t dacIndex>
 static void writeValuesToDac(DacValues *dacValues)
@@ -60,7 +59,6 @@ void setup()
 
     shiftRegisterHandler.updateHandlersFromFirstDacConfig(&preset0.dacConfigA, switchesState & 1);
     shiftRegisterHandler.updateHandlersFromSecondDacConfig(&preset0.dacConfigB, switchesState & 2);
-    shiftRegisterHandler.writeValuesToShiftRegister = writeValuesToShiftRegister;
 
     DACs[0] = Adafruit_MCP4728();
     DACs[0].begin(DAC_A_ADDRESS);

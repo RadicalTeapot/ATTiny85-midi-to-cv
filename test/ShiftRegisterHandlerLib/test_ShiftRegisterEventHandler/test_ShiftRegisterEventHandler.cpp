@@ -1,5 +1,5 @@
 #include <unity.h>
-#include "EventHandlers/ShiftRegisterEventHandler.h"
+#include "ShiftRegisterEventHandler.h"
 #include "MidiEvent.h"
 
 void setUp() {}

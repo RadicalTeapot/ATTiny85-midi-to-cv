@@ -1,7 +1,7 @@
 #ifndef ShiftRegisterEventHandlerContainer_h
 #define ShiftRegisterEventHandlerContainer_h
 
-#include "EventHandlers/ShiftRegisterEventHandler.h"
+#include "ShiftRegisterEventHandler.h"
 #include "MidiEvent.h"
 #include "Preset.h"
 
