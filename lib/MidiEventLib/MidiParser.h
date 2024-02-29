@@ -32,15 +32,15 @@ namespace MidiEventLib
         }
         inline bool isMidiNoteOn() const
         {
-            return (_lastMidiCommand & COMMAND_MASK) == NOTE_ON;
+            return (_lastMidiCommand & COMMAND_MASK) == (uint8_t)EventType::NOTE_ON;
         }
         inline bool isMidiNoteOff() const
         {
-            return (_lastMidiCommand & COMMAND_MASK) == NOTE_OFF;
+            return (_lastMidiCommand & COMMAND_MASK) == (uint8_t)EventType::NOTE_OFF;
         }
         inline bool isMidiCC() const
         {
-            return (_lastMidiCommand & COMMAND_MASK) == CONTROL_CHANGE_COMMAND;
+            return (_lastMidiCommand & COMMAND_MASK) == (uint8_t)EventType::CC;
         }
 
         inline void resetMidiData()
@@ -51,7 +51,7 @@ namespace MidiEventLib
 
         inline void resetLastMidiCommand()
         {
-            _lastMidiCommand = EventType::INVALID;
+            _lastMidiCommand = (uint8_t)EventType::INVALID;
         }
     };
 }

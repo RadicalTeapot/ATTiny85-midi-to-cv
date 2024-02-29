@@ -23,7 +23,7 @@ void test_parseMalformedMidiCommand_returnsFalse() {
 void test_parseNoteOnCommand_validData() {
     MidiEventLib::Parser midiParser;
     MidiEventLib::Event midiEvent;
-    TEST_ASSERT_FALSE(midiParser.parse(MidiEventLib::EventType::NOTE_ON | 0x01, &midiEvent));
+    TEST_ASSERT_FALSE(midiParser.parse((uint8_t)MidiEventLib::EventType::NOTE_ON | 0x01, &midiEvent));
     TEST_ASSERT_FALSE(midiParser.parse(0x02, &midiEvent));
     TEST_ASSERT_TRUE(midiParser.parse(0x03, &midiEvent));
 
@@ -36,7 +36,7 @@ void test_parseNoteOnCommand_validData() {
 void test_parseNoteOffCommand_validData() {
     MidiEventLib::Parser midiParser;
     MidiEventLib::Event midiEvent;
-    TEST_ASSERT_FALSE(midiParser.parse(MidiEventLib::EventType::NOTE_OFF | 0x01, &midiEvent));
+    TEST_ASSERT_FALSE(midiParser.parse((uint8_t)MidiEventLib::EventType::NOTE_OFF | 0x01, &midiEvent));
     TEST_ASSERT_FALSE(midiParser.parse(0x02, &midiEvent));
     TEST_ASSERT_TRUE(midiParser.parse(0x03, &midiEvent));
 
@@ -49,7 +49,7 @@ void test_parseNoteOffCommand_validData() {
 void test_parseNoteOnOffCommand_validData() {
     MidiEventLib::Parser midiParser;
     MidiEventLib::Event midiEvent;
-    TEST_ASSERT_FALSE(midiParser.parse(MidiEventLib::EventType::NOTE_ON | 0x01, &midiEvent));
+    TEST_ASSERT_FALSE(midiParser.parse((uint8_t)MidiEventLib::EventType::NOTE_ON | 0x01, &midiEvent));
     TEST_ASSERT_FALSE(midiParser.parse(0x02, &midiEvent));
     TEST_ASSERT_TRUE(midiParser.parse(0x00, &midiEvent)); // Velocity = 0 -> Note Off
 
@@ -62,7 +62,7 @@ void test_parseNoteOnOffCommand_validData() {
 void test_parseContinuousNoteCommands_validData() {
     MidiEventLib::Parser midiParser;
     MidiEventLib::Event midiEvent;
-    TEST_ASSERT_FALSE(midiParser.parse(MidiEventLib::EventType::NOTE_ON | 0x01, &midiEvent));
+    TEST_ASSERT_FALSE(midiParser.parse((uint8_t)MidiEventLib::EventType::NOTE_ON | 0x01, &midiEvent));
     TEST_ASSERT_FALSE(midiParser.parse(0x02, &midiEvent));
     TEST_ASSERT_TRUE(midiParser.parse(0x03, &midiEvent));
 
@@ -91,7 +91,7 @@ void test_parseContinuousNoteCommands_validData() {
 void test_parseCCCommand_validData() {
     MidiEventLib::Parser midiParser;
     MidiEventLib::Event midiEvent;
-    TEST_ASSERT_FALSE(midiParser.parse(MidiEventLib::EventType::CC | 0x01, &midiEvent));
+    TEST_ASSERT_FALSE(midiParser.parse((uint8_t)MidiEventLib::EventType::CC | 0x01, &midiEvent));
     TEST_ASSERT_FALSE(midiParser.parse(0x02, &midiEvent));
     TEST_ASSERT_TRUE(midiParser.parse(0x03, &midiEvent));
 
@@ -104,7 +104,7 @@ void test_parseCCCommand_validData() {
 void test_parseContinuousCCCommands_validData() {
     MidiEventLib::Parser midiParser;
     MidiEventLib::Event midiEvent;
-    TEST_ASSERT_FALSE(midiParser.parse(MidiEventLib::EventType::CC | 0x01, &midiEvent));
+    TEST_ASSERT_FALSE(midiParser.parse((uint8_t)MidiEventLib::EventType::CC | 0x01, &midiEvent));
     TEST_ASSERT_FALSE(midiParser.parse(0x02, &midiEvent));
     TEST_ASSERT_TRUE(midiParser.parse(0x03, &midiEvent));
 

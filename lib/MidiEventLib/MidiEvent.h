@@ -7,7 +7,8 @@
 #include <cstdint>
 #endif
 
-namespace MidiEventLib
+// Local constants
+namespace
 {
     const uint8_t COMMAND_MASK = 0xF0;
     const uint8_t CHANNEL_COMMAND_MASK = 0x0F;
@@ -16,8 +17,11 @@ namespace MidiEventLib
     const uint8_t NOTE_ON_COMMAND = 0x90;
     const uint8_t CONTROL_CHANGE_COMMAND = 0xB0;
     const uint8_t PROGRAM_CHANGE_COMMAND = 0xC0;
+}
 
-    enum EventType
+namespace MidiEventLib
+{
+    enum class EventType: uint8_t
     {
         NOTE_ON = NOTE_ON_COMMAND,
         NOTE_OFF = NOTE_OFF_COMMAND,
@@ -29,14 +33,14 @@ namespace MidiEventLib
 
     struct Event
     {
-        EventType type = INVALID;
+        EventType type = EventType::INVALID;
         uint8_t channel = 0;
         uint8_t firstByte = 0;
         uint8_t secondByte = 0;
 
         static void setCCEventData(Event *event, uint8_t channel, uint8_t number, uint8_t value)
         {
-            event->type = CC;
+            event->type = EventType::CC;
             event->channel = channel;
             event->firstByte = number;
             event->secondByte = value;
@@ -44,7 +48,7 @@ namespace MidiEventLib
 
         static void setNoteOnEventData(Event *event, uint8_t channel, uint8_t note, uint8_t velocity)
         {
-            event->type = NOTE_ON;
+            event->type = EventType::NOTE_ON;
             event->channel = channel;
             event->firstByte = note;
             event->secondByte = velocity;
@@ -52,7 +56,7 @@ namespace MidiEventLib
 
         static void setNoteOffEventData(Event *event, uint8_t channel, uint8_t note, uint8_t velocity)
         {
-            event->type = NOTE_OFF;
+            event->type = EventType::NOTE_OFF;
             event->channel = channel;
             event->firstByte = note;
             event->secondByte = velocity;
