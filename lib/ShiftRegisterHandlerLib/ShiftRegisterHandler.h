@@ -8,7 +8,7 @@
 class ShiftRegisterHandler
 {
 public:
-    typedef void (*WriteValuesToShiftRegister)(uint8_t values);
+    using WriteValuesToShiftRegister = void(*)(uint8_t values);
     static WriteValuesToShiftRegister writeValuesToShiftRegister;
 
     void updateHandlersFromFirstDacConfig(const DacPresetConfig *dacConfig, bool isNoteHandler);

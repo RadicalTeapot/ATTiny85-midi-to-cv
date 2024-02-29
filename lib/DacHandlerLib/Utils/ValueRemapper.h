@@ -12,7 +12,7 @@
 
 namespace ValueRemapper
 {
-    typedef uint16_t (*RemapMidiValue)(const uint8_t);
+    using RemapMidiValue = uint16_t(*)(const uint8_t);
 
     const uint8_t MIDI_MIN_VALUE = 0;
     const uint8_t MIDI_MAX_VALUE = 127;

@@ -8,7 +8,7 @@
 class DacHandler
 {
 public:
-    typedef void (*WriteValuesToDac)(DacValues *dacValues);
+    using WriteValuesToDac = void(*)(DacValues *dacValues);
 
     DacHandler(WriteValuesToDac writeValuesToDac = defaultWriteValuesToDac) : _writeValuesToDac(writeValuesToDac) {};
     void configure(const DacPresetConfig *dacConfig, bool isNoteHandler) { _handlerContainer.configureHandlers(dacConfig, isNoteHandler); }

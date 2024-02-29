@@ -7,7 +7,7 @@ template <uint8_t midiChannel>
 class ShiftRegisterEventHandler
 {
 public:
-    typedef bool (*ShouldProcessEventFunc)(const MidiEventLib::Event *event, const uint8_t checkedValue);
+    using ShouldProcessEventFunc = bool(*)(const MidiEventLib::Event *event, const uint8_t checkedValue);
 
     ShiftRegisterEventHandler(const uint8_t checkedValue = midiChannel, const bool isChannelHandler = true)
         : _checkedValue(checkedValue), _isChannelHandler(isChannelHandler) {}
